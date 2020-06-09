@@ -31,8 +31,12 @@
 #define UMQTT_MAX_PACKET_ID                             65535   
 #define UMQTT_INFO_DEF_UPLINK_TIMER_TICK                1000 
 
-// #define PKG_UMQTT_PUBLISH_RECON_MAX                     3               /* qos2 下重发次数 */
-// #define PKG_UMQTT_QOS2_QUE_MAX                          1               
+#ifndef PKG_UMQTT_PUBLISH_RECON_MAX
+#define PKG_UMQTT_PUBLISH_RECON_MAX                     3
+#endif
+#ifndef PKG_UMQTT_QOS2_QUE_MAX
+#define PKG_UMQTT_QOS2_QUE_MAX                          1
+#endif            
 #define PKG_UMQTT_RECPUBREC_INTERVAL_TIME               (2 * UMQTT_INFO_DEF_UPLINK_TIMER_TICK)
 
 #endif
