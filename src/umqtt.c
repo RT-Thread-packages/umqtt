@@ -178,6 +178,11 @@ static int add_one_qos2_msg(struct umqtt_client *client, struct umqtt_pkgs_publi
         LOG_E(" add qos2 message failed! input params is valid! ");
     }
 
+    if (_ret == UMQTT_OK)
+    {
+        rt_list_insert_after(&client->qos2_msg_list, &msg->next_list);
+    }
+
 _exit:
     if (_ret == UMQTT_MEM_FULL)
     {
@@ -196,14 +201,15 @@ static int qos2_publish_delete(struct umqtt_client *client, int packet_id)
 {
     int _ret = UMQTT_OK, tmp_ret = 0;
     struct umqtt_qos2_msg *p_msg = RT_NULL;
-    struct umqtt_qos2_msg *p_msg_tmp = RT_NULL;
+    rt_list_t *node = RT_NULL;
     struct umqtt_pkgs_publish publish_msg = { 0 };
     /* call publish, delete packet id delete */
 
     if ((tmp_ret == rt_list_isempty(&client->qos2_msg_list)) == 0)
     {
-        rt_list_for_each_entry_safe(p_msg, p_msg_tmp, &client->qos2_msg_list, next_list)
+        rt_list_for_each(node, &client->qos2_msg_list)
         {
+            p_msg = rt_list_entry(node, struct umqtt_qos2_msg, next_list);
             if (p_msg->packet_id == packet_id)
             {
                 LOG_D(" qos2, deliver message! topic nme: %s ", p_msg->topic_name);
@@ -565,9 +571,10 @@ static void umqtt_deliver_message(struct umqtt_client *client,
     RT_ASSERT(msg);
 
     struct subtop_recv_handler *p_subtop = RT_NULL;
-    rt_list_for_each_entry(p_subtop, &client->sub_recv_list, next_list)
+    rt_list_t *node = RT_NULL;
+    rt_list_for_each(node, &client->sub_recv_list)
     {
-        
+        p_subtop = rt_list_entry(node, struct subtop_recv_handler, next_list);
         if ((p_subtop->topicfilter)
          && (topicname_is_matched(p_subtop->topicfilter, (char *)topic_name, len)))
         {
@@ -1099,9 +1106,9 @@ int umqtt_delete(struct umqtt_client *client)
 {   
     int _ret = 0, _cnt = 0;
     struct subtop_recv_handler *p_subtop = RT_NULL;
-    struct subtop_recv_handler *p_temp = RT_NULL;
     struct umqtt_qos2_msg *p_msg = RT_NULL;
-    struct umqtt_qos2_msg *p_msg_tmp = RT_NULL;
+    rt_list_t *node = RT_NULL;
+    rt_list_t *node_tmp = RT_NULL;
     if (client == RT_NULL)
         return _ret;
     if (client->task_handle)
@@ -1139,8 +1146,9 @@ int umqtt_delete(struct umqtt_client *client)
     }
     if ((_ret = rt_list_isempty(&client->sub_recv_list)) == 0)
     {
-        rt_list_for_each_entry_safe(p_subtop, p_temp, &client->sub_recv_list, next_list)
+        rt_list_for_each_safe(node, node_tmp, &client->sub_recv_list)
         {
+            p_subtop = rt_list_entry(node, struct subtop_recv_handler, next_list);
             if (p_subtop->topicfilter) {        // const char *, cannot free!
                 rt_free(p_subtop->topicfilter);
                 p_subtop->topicfilter = RT_NULL;
@@ -1153,8 +1161,9 @@ int umqtt_delete(struct umqtt_client *client)
 
     if ((_ret == rt_list_isempty(&client->qos2_msg_list)) == 0)
     {
-        rt_list_for_each_entry_safe(p_msg, p_msg_tmp, &client->qos2_msg_list, next_list)
+        rt_list_for_each_safe(node, node_tmp, &client->qos2_msg_list)
         {
+            p_msg = rt_list_entry(node, struct umqtt_qos2_msg, next_list);
             if (p_msg->topic_name) { rt_free(p_msg->topic_name); p_msg->topic_name = RT_NULL; }
             if (p_msg->payload) { rt_free(p_msg->payload); p_msg->payload = RT_NULL; }
             rt_list_remove(&(p_msg->next_list));
@@ -1320,6 +1329,7 @@ int umqtt_start(struct umqtt_client *client)
 {
     int _ret = 0, _length = 0;
     struct subtop_recv_handler *p_subtop = RT_NULL;
+    rt_list_t *node = RT_NULL;
     struct umqtt_msg encode_msg = { 0 };
     struct umqtt_msg_ack msg_ack = { 0 };
     if (client == RT_NULL) {
@@ -1352,8 +1362,9 @@ int umqtt_start(struct umqtt_client *client)
     /* will message topic to send & recv */
     if (0 == rt_list_isempty(&client->sub_recv_list))
     {
-        rt_list_for_each_entry(p_subtop, &client->sub_recv_list, next_list)
+        rt_list_for_each(node, &client->sub_recv_list)
         {
+            p_subtop = rt_list_entry(node, struct subtop_recv_handler, next_list);
             rt_memset(&encode_msg, 0, sizeof(encode_msg));
             encode_msg.header.bits.qos = UMQTT_QOS1;
             encode_msg.msg.subscribe.packet_id = get_next_packetID(client);
@@ -1646,6 +1657,7 @@ int umqtt_subscribe(struct umqtt_client *client, const char *topic, enum umqtt_q
     int _length = 0;
     int _cnt = 0;
     struct subtop_recv_handler *p_subtop = RT_NULL;
+    rt_list_t *node = RT_NULL;
     struct umqtt_msg encode_msg = { 0 };
     struct umqtt_msg_ack msg_ack = { 0 };
 
@@ -1657,8 +1669,9 @@ int umqtt_subscribe(struct umqtt_client *client, const char *topic, enum umqtt_q
     if (_cnt == 0) 
     {
         _cnt = 0;
-        rt_list_for_each_entry(p_subtop, &client->sub_recv_list, next_list) 
+        rt_list_for_each(node, &client->sub_recv_list)
         {    
+            p_subtop = rt_list_entry(node, struct subtop_recv_handler, next_list);
             if (p_subtop->topicfilter 
             && (rt_strncmp(p_subtop->topicfilter, topic, rt_strlen(topic)) == 0)) 
             {
@@ -1760,7 +1773,8 @@ int umqtt_unsubscribe(struct umqtt_client *client, const char *topic)
 {
     int _ret = 0, _cnt = 0, _length = 0;
     struct subtop_recv_handler *p_subtop = RT_NULL;
-    struct subtop_recv_handler *p_temp = RT_NULL;
+    rt_list_t *node = RT_NULL;
+    rt_list_t *node_tmp = RT_NULL;
     struct umqtt_msg encode_msg = { 0 };
     struct umqtt_msg_ack msg_ack = { 0 };
 
@@ -1770,8 +1784,9 @@ int umqtt_unsubscribe(struct umqtt_client *client, const char *topic)
 
     if (_cnt > 0)
     {
-        rt_list_for_each_entry_safe(p_subtop, p_temp, &client->sub_recv_list, next_list) 
+        rt_list_for_each_safe(node, node_tmp, &client->sub_recv_list)
         {
+            p_subtop = rt_list_entry(node, struct subtop_recv_handler, next_list);
             _cnt--;
             if (p_subtop->topicfilter
             && (rt_strncmp(p_subtop->topicfilter, topic, strlen(topic)) == 0)) 
@@ -1914,6 +1929,7 @@ exit:
 int umqtt_control(struct umqtt_client *client, enum umqtt_cmd cmd, void *params)
 {
     struct subtop_recv_handler *p_subtop = RT_NULL;
+    rt_list_t *node = RT_NULL;
     char *topic = RT_NULL;
     int _ret = 0;
     RT_ASSERT(client);
@@ -1924,8 +1940,9 @@ int umqtt_control(struct umqtt_client *client, enum umqtt_cmd cmd, void *params)
             RT_ASSERT(params);
             if (0 == rt_list_isempty(&client->sub_recv_list))       /* has list item */
             {
-                rt_list_for_each_entry(p_subtop, &client->sub_recv_list, next_list)
+                rt_list_for_each(node, &client->sub_recv_list)
                 {
+                    p_subtop = rt_list_entry(node, struct subtop_recv_handler, next_list);
                     topic = ((struct subtop_recv_handler *)params)->topicfilter;
                     if ((p_subtop->topicfilter != RT_NULL)
                      && (rt_strncmp(p_subtop->topicfilter, topic, rt_strlen(topic)) == 0))
