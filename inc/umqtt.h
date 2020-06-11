@@ -17,8 +17,8 @@
 extern "C" {
 #endif
 
-#define UMQTT_SW_VERSION            "1.0.0"
-#define UMQTT_SW_VERSION_NUM        0x10000
+#define UMQTT_SW_VERSION            "1.0.1"
+#define UMQTT_SW_VERSION_NUM        0x10001
 
 enum umqtt_client_state
 {
