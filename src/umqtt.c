@@ -1961,7 +1961,7 @@ int umqtt_control(struct umqtt_client *client, enum umqtt_cmd cmd, void *params)
         break;
     case UMQTT_CMD_SET_HB:
         {
-            client->mqtt_info.keepalive_interval = (rt_uint32_t *)params;
+            client->mqtt_info.keepalive_interval = *(rt_uint32_t *)params;
         }
         break;
     case UMQTT_CMD_GET_CLIENT_STA:
