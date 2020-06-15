@@ -215,7 +215,7 @@ static int qos2_publish_delete(struct umqtt_client *client, int packet_id)
                 LOG_D(" qos2, deliver message! topic nme: %s ", p_msg->topic_name);
                 publish_msg.topic_name_len = p_msg->topic_name_len;
                 publish_msg.payload_len = p_msg->payload_len;
-                publish_msg.packet_id = p_msg->payload;
+                publish_msg.packet_id = p_msg->packet_id;
                 publish_msg.topic_name = p_msg->topic_name;
                 publish_msg.payload = p_msg->payload;
                 umqtt_deliver_message(client, p_msg->topic_name, p_msg->topic_name_len, &publish_msg);
