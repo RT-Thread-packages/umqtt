@@ -12,9 +12,6 @@ src += Glob('src/trans/*.c');
 if GetDepend('PKG_USING_UMQTT_EXAMPLE'):
     src += Glob('samples/*.c');
 
-if GetDepend('PKG_USING_UMQTT_TEST'):
-    src += Glob('tests/*.c');
-
 path = [cwd + '/inc']
 
 group = DefineGroup('umqtt', src, depend = ['PKG_USING_UMQTT'], CPPPATH = path)
