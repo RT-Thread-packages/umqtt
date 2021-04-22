@@ -78,7 +78,7 @@ enum umqtt_qos { UMQTT_QOS0 = 0, UMQTT_QOS1 = 1, UMQTT_QOS2 = 2, UMQTT_SUBFAIL =
 struct umqtt_client;
 typedef struct umqtt_client *umqtt_client_t;
 typedef int (*umqtt_user_callback)(struct umqtt_client *client, enum umqtt_evt event);
-typedef void (*umqtt_subscribe_cb)(void *client, void *msg);
+typedef void (*umqtt_subscribe_cb)(struct umqtt_client *client, void *msg);
 
 struct subtop_recv_handler
 {

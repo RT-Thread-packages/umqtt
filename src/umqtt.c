@@ -1673,7 +1673,7 @@ int umqtt_subscribe(struct umqtt_client *client, const char *topic, enum umqtt_q
         {    
             p_subtop = rt_list_entry(node, struct subtop_recv_handler, next_list);
             if (p_subtop->topicfilter 
-            && (rt_strncmp(p_subtop->topicfilter, topic, rt_strlen(topic)) == 0)) 
+            && (rt_strcmp(p_subtop->topicfilter, topic) == 0)) 
             {
                 LOG_D(" subscribe topic(%s) is already subscribed.", topic);
                 goto exit;
