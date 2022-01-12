@@ -142,10 +142,10 @@ static int umqtt_resolve_uri(const char *umqtt_uri, struct addrinfo **res)
             goto exit;
         }
 
-        memcpy(host_addr_new, host_addr, host_addr_len);
+        rt_memcpy(host_addr_new, host_addr, host_addr_len);
         host_addr_new[host_addr_len] = '\0';
 
-        memset(&hint, 0, sizeof(hint));
+        rt_memset(&hint, 0, sizeof(hint));
 
         ret = getaddrinfo(host_addr_new, port_str, &hint, res);
         if (ret != 0)
