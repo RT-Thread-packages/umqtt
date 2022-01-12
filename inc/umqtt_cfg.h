@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2006-2020, RT-Thread Development Team
+ * Copyright (c) 2006-2022, RT-Thread Development Team
  *
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -13,11 +13,11 @@
 
 #define PKG_UMQTT_PROTOCOL_NAME                         ("MQTC")
 #define PKG_UMQTT_PROTOCOL_NAME_LEN                     (rt_strlen(PKG_UMQTT_PROTOCOL_NAME))
-#define PKG_UMQTT_PROTOCOL_LEVEL                        (4)             /* MQTT3.1.1 ver_lvl:4;  MQTT3.1 ver_lvl:3 */ 
+#define PKG_UMQTT_PROTOCOL_LEVEL                        (4)             /* MQTT3.1.1 ver_lvl:4;  MQTT3.1 ver_lvl:3 */
 
 #ifdef PKG_UMQTT_WILL_TOPIC_STRING
 #define UMQTT_WILL_TOPIC                                PKG_UMQTT_WILL_TOPIC_STRING
-#else 
+#else
 #define UMQTT_WILL_TOPIC                                ("/umqtt/test")
 #endif
 
@@ -28,15 +28,15 @@
 #endif
 
 #define UMQTT_INFO_DEF_THREAD_TICK                      50
-#define UMQTT_MAX_PACKET_ID                             65535   
-#define UMQTT_INFO_DEF_UPLINK_TIMER_TICK                1000 
+#define UMQTT_MAX_PACKET_ID                             65535
+#define UMQTT_INFO_DEF_UPLINK_TIMER_TICK                1000
 
 #ifndef PKG_UMQTT_PUBLISH_RECON_MAX
 #define PKG_UMQTT_PUBLISH_RECON_MAX                     3
 #endif
 #ifndef PKG_UMQTT_QOS2_QUE_MAX
 #define PKG_UMQTT_QOS2_QUE_MAX                          1
-#endif            
+#endif
 #define PKG_UMQTT_RECPUBREC_INTERVAL_TIME               (2 * UMQTT_INFO_DEF_UPLINK_TIMER_TICK)
 
 #endif

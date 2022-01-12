@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2006-2020, RT-Thread Development Team
+ * Copyright (c) 2006-2022, RT-Thread Development Team
  *
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -66,40 +66,40 @@ struct umqtt_pubrec_msg
 
 struct umqtt_client
 {
-    int sock;                                                   /* socket sock */ 
-    enum umqtt_client_state connect_state;                      /* mqtt client status */ 
+    int sock;                                                   /* socket sock */
+    enum umqtt_client_state connect_state;                      /* mqtt client status */
 
-    struct umqtt_info mqtt_info;                                /* user mqtt config information */ 
-    rt_uint8_t reconnect_count;                                 /* mqtt client reconnect count */ 
-    rt_uint8_t keepalive_count;                                 /* mqtt keepalive count */ 
+    struct umqtt_info mqtt_info;                                /* user mqtt config information */
+    rt_uint8_t reconnect_count;                                 /* mqtt client reconnect count */
+    rt_uint8_t keepalive_count;                                 /* mqtt keepalive count */
     rt_uint32_t pingreq_last_tick;                              /* mqtt ping request message */
-    rt_uint32_t uplink_next_tick;                               /* uplink (include: publish/subscribe/unsub/connect/ping/... client->broker) next tick(ping) */ 
-    rt_uint32_t uplink_last_tick;                               /* uplink (include: publish/subscribe/unsub/connect/ping/... client->broker) next tick(ping) */ 
-    rt_uint32_t reconnect_next_tick;                            /* client unlink, reconnect next tick */ 
-    rt_uint32_t reconnect_last_tick;                            /* client unlink, reconnect last tick */ 
+    rt_uint32_t uplink_next_tick;                               /* uplink (include: publish/subscribe/unsub/connect/ping/... client->broker) next tick(ping) */
+    rt_uint32_t uplink_last_tick;                               /* uplink (include: publish/subscribe/unsub/connect/ping/... client->broker) next tick(ping) */
+    rt_uint32_t reconnect_next_tick;                            /* client unlink, reconnect next tick */
+    rt_uint32_t reconnect_last_tick;                            /* client unlink, reconnect last tick */
 
-    rt_uint8_t *send_buf, *recv_buf;                            /* send data buffer, receive data buffer */ 
-    rt_size_t send_len, recv_len;                               /* send datas length, receive datas length */ 
+    rt_uint8_t *send_buf, *recv_buf;                            /* send data buffer, receive data buffer */
+    rt_size_t send_len, recv_len;                               /* send datas length, receive datas length */
 
-    rt_uint16_t packet_id;                                      /* mqtt packages id */ 
+    rt_uint16_t packet_id;                                      /* mqtt packages id */
 
-    rt_mutex_t lock_client;                                     /* mqtt client lock */ 
-    rt_mq_t msg_queue;                                          /* fro receive thread with other thread to communicate message */ 
+    rt_mutex_t lock_client;                                     /* mqtt client lock */
+    rt_mq_t msg_queue;                                          /* fro receive thread with other thread to communicate message */
 
-    rt_timer_t uplink_timer;                                    /* client send message to broker manager timer */ 
+    rt_timer_t uplink_timer;                                    /* client send message to broker manager timer */
 
-    int sub_recv_list_len;                                      /* subscribe topic, receive topicname to deal datas */ 
-    rt_list_t sub_recv_list;                                    /* subscribe information list header */ 
+    int sub_recv_list_len;                                      /* subscribe topic, receive topicname to deal datas */
+    rt_list_t sub_recv_list;                                    /* subscribe information list header */
 
     rt_list_t qos2_msg_list;                                    /* qos2 message list */
-    struct umqtt_pubrec_msg pubrec_msg[PKG_UMQTT_QOS2_QUE_MAX]; /* pubrec message array */                   
+    struct umqtt_pubrec_msg pubrec_msg[PKG_UMQTT_QOS2_QUE_MAX]; /* pubrec message array */
 
-    umqtt_user_callback user_handler;                           /* user handler */ 
+    umqtt_user_callback user_handler;                           /* user handler */
 
-    void *user_data;                                            /* user data */ 
-    rt_thread_t task_handle;                                    /* task thread */ 
+    void *user_data;                                            /* user data */
+    rt_thread_t task_handle;                                    /* task thread */
 
-    rt_list_t list;                                             /* list header */ 
+    rt_list_t list;                                             /* list header */
 };
 
 enum tick_item
@@ -111,8 +111,8 @@ enum tick_item
 };
 
 static int umqtt_handle_readpacket(struct umqtt_client *client);
-static void umqtt_deliver_message(struct umqtt_client *client, 
-                                const char *topic_name, int len, 
+static void umqtt_deliver_message(struct umqtt_client *client,
+                                const char *topic_name, int len,
                                 struct umqtt_pkgs_publish *msg);
 
 static int get_next_packetID(struct umqtt_client *client)
@@ -138,10 +138,10 @@ static int add_one_qos2_msg(struct umqtt_client *client, struct umqtt_pkgs_publi
                 msg->topic_name_len = pdata->topic_name_len;
                 msg->packet_id = pdata->packet_id;
                 msg->payload_len = pdata->payload_len;
-                if ((pdata->topic_name != RT_NULL) && (pdata->topic_name_len != 0)) 
+                if ((pdata->topic_name != RT_NULL) && (pdata->topic_name_len != 0))
                 {
                     msg->topic_name = (char *)rt_calloc(1, sizeof(char) * pdata->topic_name_len);
-                    if (msg->topic_name) 
+                    if (msg->topic_name)
                     {
                         rt_strncpy(msg->topic_name, pdata->topic_name, msg->topic_name_len);
                     }
@@ -161,7 +161,7 @@ static int add_one_qos2_msg(struct umqtt_client *client, struct umqtt_pkgs_publi
                     else
                     {
                         _ret = UMQTT_MEM_FULL;
-                        LOG_E(" calloc umqtt qos2 message payload failed! memory full! ");                        
+                        LOG_E(" calloc umqtt qos2 message payload failed! memory full! ");
                     }
                 }
             }
@@ -285,7 +285,7 @@ static int pubrec_cycle_callback(struct umqtt_client *client)
     {
         if ((client->pubrec_msg[_cnt].cnt != -1)
          && (client->pubrec_msg[_cnt].packet_id != -1)
-         && (client->pubrec_msg[_cnt].next_tick != -1)) 
+         && (client->pubrec_msg[_cnt].next_tick != -1))
         {
             if (client->pubrec_msg[_cnt].next_tick <= rt_tick_get())
             {
@@ -312,7 +312,7 @@ static int pubrec_cycle_callback(struct umqtt_client *client)
                     encode_msg.header.bits.type = UMQTT_TYPE_PUBREC;
                     encode_msg.msg.pubrec.packet_id = client->pubrec_msg[_cnt].packet_id;
 
-                    _ret = umqtt_encode(encode_msg.header.bits.type, client->send_buf, client->mqtt_info.send_size, 
+                    _ret = umqtt_encode(encode_msg.header.bits.type, client->send_buf, client->mqtt_info.send_size,
                                        &encode_msg);
                     if (_ret < 0)
                     {
@@ -322,13 +322,13 @@ static int pubrec_cycle_callback(struct umqtt_client *client)
                     }
                     client->send_len = _ret;
 
-                    _ret = umqtt_trans_send(client->sock, client->send_buf, client->send_len, 
+                    _ret = umqtt_trans_send(client->sock, client->send_buf, client->send_len,
                                             client->mqtt_info.send_timeout);
-                    if (_ret < 0) 
+                    if (_ret < 0)
                     {
                         _ret = UMQTT_SEND_FAILED;
                         LOG_E(" trans send failed!");
-                        goto _exit;                    
+                        goto _exit;
                     }
                 }
             }
@@ -395,13 +395,13 @@ _reconnect:
         goto exit;
     }
     _ret = umqtt_trans_connect(client->mqtt_info.uri, &(client->sock));
-    if (_ret < 0) 
+    if (_ret < 0)
     {
         _ret = UMQTT_SOCK_CONNECT_FAILED;
         LOG_E(" umqtt connect, transport connect failed!");
         goto disconnect;
     }
-    
+
     encode_msg.msg.connect.protocol_name_len = PKG_UMQTT_PROTOCOL_NAME_LEN;
     encode_msg.msg.connect.protocol_name = PKG_UMQTT_PROTOCOL_NAME;
     encode_msg.msg.connect.protocol_level = PKG_UMQTT_PROTOCOL_LEVEL;
@@ -415,7 +415,7 @@ _reconnect:
     encode_msg.msg.connect.will_topic = client->mqtt_info.lwt_topic;
     encode_msg.msg.connect.will_message = client->mqtt_info.lwt_message;
     encode_msg.msg.connect.user_name = client->mqtt_info.user_name;
-    if (client->mqtt_info.user_name) 
+    if (client->mqtt_info.user_name)
     {
         encode_msg.msg.connect.connect_flags.bits.username_flag = 1;
     }
@@ -426,16 +426,16 @@ _reconnect:
     }
 
     _length = umqtt_encode(UMQTT_TYPE_CONNECT, client->send_buf, client->mqtt_info.send_size, &encode_msg);
-    if (_length <= 0) 
+    if (_length <= 0)
     {
         _ret = UMQTT_ENCODE_ERROR;
         LOG_E(" connect encode failed!");
         goto exit;
     }
     client->send_len = _length;
-    
+
     _ret = umqtt_trans_send(client->sock, client->send_buf, client->send_len, client->mqtt_info.send_timeout);
-    if (_ret < 0) 
+    if (_ret < 0)
     {
         _ret = UMQTT_SEND_FAILED;
         LOG_E(" connect trans send failed! errno:0x%04x", errno);
@@ -444,7 +444,7 @@ _reconnect:
 
     set_uplink_recon_tick(client, UPLINK_LAST_TICK);
 
-    if (block != 0) 
+    if (block != 0)
     {
         _ret = umqtt_handle_readpacket(client);
         if (_ret == UMQTT_FIN_ACK)
@@ -452,12 +452,12 @@ _reconnect:
             LOG_D(" server fin ack, connect failed!");
             goto disconnect;
         }
-        else if (_ret < 0) 
+        else if (_ret < 0)
         {
             _ret = UMQTT_READ_ERROR;
             LOG_E(" connect trans recv failed!");
             goto exit;
-        } 
+        }
 
         while (1)
         {
@@ -465,9 +465,9 @@ _reconnect:
             {
                 _ret = UMQTT_TIMEOUT;
                 LOG_E(" connect recv message timeout!");
-                goto exit; 
+                goto exit;
             }
-            else 
+            else
             {
                 if (client->connect_state == UMQTT_CS_LINKED)
                 {
@@ -489,13 +489,13 @@ disconnect:
         _ret = UMQTT_FIN_ACK;
         umqtt_trans_disconnect(client->sock);
         client->sock = -1;
-        rt_thread_delay(RT_TICK_PER_SECOND * 5);            
+        rt_thread_delay(RT_TICK_PER_SECOND * 5);
         LOG_E(" server send fin ack, need to reconnect!");
         goto _reconnect;
     }
 
 exit:
-    if (_ret < 0) 
+    if (_ret < 0)
     {
         set_connect_status(client, UMQTT_CS_DISCONNECT);            /* reconnect failed */
         LOG_W(" set client status disconnect! ");
@@ -509,7 +509,7 @@ static int umqtt_disconnect(struct umqtt_client *client)
     RT_ASSERT(client);
 
     _length = umqtt_encode(UMQTT_TYPE_DISCONNECT, client->send_buf, client->mqtt_info.send_size, RT_NULL);
-    if (_length < 0) 
+    if (_length < 0)
     {
         _ret = UMQTT_ENCODE_ERROR;
         LOG_E(" disconnect encode failed!");
@@ -517,9 +517,9 @@ static int umqtt_disconnect(struct umqtt_client *client)
     }
     client->send_len = _length;
 
-    _ret = umqtt_trans_send(client->sock, client->send_buf, client->send_len, 
+    _ret = umqtt_trans_send(client->sock, client->send_buf, client->send_len,
                             client->mqtt_info.send_timeout);
-    if (_ret < 0) 
+    if (_ret < 0)
     {
         _ret = UMQTT_SEND_FAILED;
         LOG_E(" disconnect trans send failed!");
@@ -562,8 +562,8 @@ static rt_uint8_t topicname_is_matched(char *topic_filter, char *topic_name, int
     return ((cur_n == cur_n_end) && (*cur_f == '\0'));
 }
 
-static void umqtt_deliver_message(struct umqtt_client *client, 
-                                const char *topic_name, int len, 
+static void umqtt_deliver_message(struct umqtt_client *client,
+                                const char *topic_name, int len,
                                 struct umqtt_pkgs_publish *msg)
 {
     RT_ASSERT(client);
@@ -600,32 +600,32 @@ static int umqtt_readpacket(struct umqtt_client *client, unsigned char *buf, int
         return _ret;
     }
 
-    while (bytes < len) 
+    while (bytes < len)
     {
         _ret = umqtt_trans_recv(client->sock, &buf[bytes], (size_t)(len - bytes));
-        if (_ret == -1) 
+        if (_ret == -1)
         {
-            if (!(errno == EINTR || errno == EWOULDBLOCK || errno == EAGAIN)) 
+            if (!(errno == EINTR || errno == EWOULDBLOCK || errno == EAGAIN))
             {
                 _ret = UMQTT_READ_FAILED;
                 LOG_E(" readpacket error! errno(%d)", errno);
                 goto exit;
             }
-        } 
-        else if (_ret == 0) 
+        }
+        else if (_ret == 0)
         {
             _ret = UMQTT_FIN_ACK;
             LOG_W(" readpacket return 0!");
             goto exit;
-        } 
-        else 
+        }
+        else
         {
             bytes += _ret;
         }
-        if ((rt_tick_get() - end_tick) < (RT_TICK_MAX >> 1)) 
+        if ((rt_tick_get() - end_tick) < (RT_TICK_MAX >> 1))
         {
             _ret = UMQTT_READ_TIMEOUT;
-            LOG_W(" readpacket timeout! now_tick(%ld), endtick(%ld), timeout(%ld) ", 
+            LOG_W(" readpacket timeout! now_tick(%ld), endtick(%ld), timeout(%ld) ",
                 rt_tick_get(), end_tick, timeout_tick);
             goto exit;
         }
@@ -650,16 +650,16 @@ static int umqtt_handle_readpacket(struct umqtt_client *client)
 
     /* 1. read the heade type */
     _temp_ret = umqtt_trans_recv(client->sock, client->recv_buf, 1);
-    if (_temp_ret <= 0) 
+    if (_temp_ret <= 0)
     {
         _ret = UMQTT_FIN_ACK;
         LOG_W(" server fin ack! connect failed! need to reconnect!");
         goto exit;
-    } 
+    }
 
     /* 2. read length */
     do {
-        if (++_cnt > MAX_NO_OF_REMAINING_LENGTH_BYTES) 
+        if (++_cnt > MAX_NO_OF_REMAINING_LENGTH_BYTES)
         {
             _ret = UMQTT_FAILED;
             LOG_E(" umqtt packet length error!");
@@ -671,14 +671,14 @@ static int umqtt_handle_readpacket(struct umqtt_client *client)
             LOG_W(" server fin ack! connect failed! need to reconnect!");
             goto exit;
         }
-        else if (_ret != UMQTT_OK) 
+        else if (_ret != UMQTT_OK)
         {
             _ret = UMQTT_READ_FAILED;
             goto exit;
         }
         *(client->recv_buf + _cnt) = _onedata;
         _pkt_len += (_onedata & 0x7F) * _multiplier;
-        _multiplier *= 0x80; 
+        _multiplier *= 0x80;
     } while ((_onedata & 0x80) != 0);
 
     /* read and delete if the data length is greater than the cache buff */
@@ -687,7 +687,7 @@ static int umqtt_handle_readpacket(struct umqtt_client *client)
         LOG_W(" socket read buffer too short! will read and delete socket buff! ");
         _loop_cnt = _pkt_len / client->mqtt_info.recv_size;
 
-        do 
+        do
         {
             if (_loop_cnt == 0)
             {
@@ -696,7 +696,7 @@ static int umqtt_handle_readpacket(struct umqtt_client *client)
                 LOG_W(" finish read and delete socket buff!");
                 goto exit;
             }
-            else 
+            else
             {
                 _loop_cnt--;
                 umqtt_readpacket(client, client->recv_buf, client->mqtt_info.recv_size, client->mqtt_info.recv_time_ms);
@@ -722,7 +722,7 @@ static int umqtt_handle_readpacket(struct umqtt_client *client)
     /* 4. encode packet datas */
     rt_memset(&decode_msg, 0, sizeof(decode_msg));
     _ret = umqtt_decode(client->recv_buf, _pkt_len + _cnt + 1, &decode_msg);
-    if (_ret < 0) 
+    if (_ret < 0)
     {
         _ret = UMQTT_DECODE_ERROR;
         LOG_E(" decode error!");
@@ -742,16 +742,16 @@ static int umqtt_handle_readpacket(struct umqtt_client *client)
         {
             LOG_D(" read publish cmd information!");
             set_uplink_recon_tick(client, UPLINK_NEXT_TICK);
-            
-            if (decode_msg.header.bits.qos != UMQTT_QOS2) 
+
+            if (decode_msg.header.bits.qos != UMQTT_QOS2)
             {
                 LOG_D(" qos: %d, deliver message! topic nme: %s ", decode_msg.header.bits.qos, decode_msg.msg.publish.topic_name);
-                umqtt_deliver_message(client, decode_msg.msg.publish.topic_name, decode_msg.msg.publish.topic_name_len, 
+                umqtt_deliver_message(client, decode_msg.msg.publish.topic_name, decode_msg.msg.publish.topic_name_len,
                                     &(decode_msg.msg.publish));
             }
 
             if (decode_msg.header.bits.qos != UMQTT_QOS0)
-            {   
+            {
                 rt_memset(&encode_msg, 0, sizeof(encode_msg));
                 encode_msg.header.bits.qos = decode_msg.header.bits.qos;
                 encode_msg.header.bits.dup = decode_msg.header.bits.dup;
@@ -767,8 +767,8 @@ static int umqtt_handle_readpacket(struct umqtt_client *client)
                     encode_msg.msg.pubrel.packet_id = decode_msg.msg.publish.packet_id;
                     add_one_pubrec_msg(client, encode_msg.msg.pubrel.packet_id);        /* add pubrec message */
                 }
-                
-                _ret = umqtt_encode(encode_msg.header.bits.type, client->send_buf, client->mqtt_info.send_size, 
+
+                _ret = umqtt_encode(encode_msg.header.bits.type, client->send_buf, client->mqtt_info.send_size,
                                     &encode_msg);
                 if (_ret < 0)
                 {
@@ -778,15 +778,15 @@ static int umqtt_handle_readpacket(struct umqtt_client *client)
                 }
                 client->send_len = _ret;
 
-                _ret = umqtt_trans_send(client->sock, client->send_buf, client->send_len, 
+                _ret = umqtt_trans_send(client->sock, client->send_buf, client->send_len,
                                         client->mqtt_info.send_timeout);
-                if (_ret < 0) 
+                if (_ret < 0)
                 {
                     _ret = UMQTT_SEND_FAILED;
                     LOG_E(" trans send failed!");
-                    goto exit;                    
+                    goto exit;
                 }
-                
+
             }
         }
         break;
@@ -797,7 +797,7 @@ static int umqtt_handle_readpacket(struct umqtt_client *client)
             msg_ack.msg_type = UMQTT_TYPE_PUBACK;
             msg_ack.packet_id = decode_msg.msg.puback.packet_id;
             _ret = rt_mq_send(client->msg_queue, &msg_ack, sizeof(struct umqtt_msg_ack));
-            if (_ret != RT_EOK) 
+            if (_ret != RT_EOK)
             {
                 _ret = UMQTT_SEND_FAILED;
                 LOG_E(" mq send failed!");
@@ -824,12 +824,12 @@ static int umqtt_handle_readpacket(struct umqtt_client *client)
         break;
     case UMQTT_TYPE_PUBREL:
         {
-            LOG_D(" read pubrel cmd information!");   
+            LOG_D(" read pubrel cmd information!");
 
             rt_memset(&encode_msg, 0, sizeof(encode_msg));
             encode_msg.header.bits.type = UMQTT_TYPE_PUBCOMP;
             encode_msg.header.bits.qos = decode_msg.header.bits.qos;
-            encode_msg.header.bits.dup = decode_msg.header.bits.dup;            
+            encode_msg.header.bits.dup = decode_msg.header.bits.dup;
             encode_msg.msg.pubrel.packet_id = decode_msg.msg.pubrec.packet_id;
 
             /* publish callback, and delete callback */
@@ -847,13 +847,13 @@ static int umqtt_handle_readpacket(struct umqtt_client *client)
             }
             client->send_len = _ret;
 
-            _ret = umqtt_trans_send(client->sock, client->send_buf, client->send_len, 
+            _ret = umqtt_trans_send(client->sock, client->send_buf, client->send_len,
                                     client->mqtt_info.send_timeout);
-            if (_ret < 0) 
+            if (_ret < 0)
             {
                 _ret = UMQTT_SEND_FAILED;
                 LOG_E(" trans send failed!");
-                goto exit;                    
+                goto exit;
             }
 
         }
@@ -866,11 +866,11 @@ static int umqtt_handle_readpacket(struct umqtt_client *client)
             msg_ack.msg_type = UMQTT_TYPE_PUBCOMP;
             msg_ack.packet_id = decode_msg.msg.pubcomp.packet_id;
             _ret = rt_mq_send(client->msg_queue, &msg_ack, sizeof(struct umqtt_msg_ack));
-            if (_ret != RT_EOK) 
+            if (_ret != RT_EOK)
             {
                 _ret = UMQTT_SEND_FAILED;
                 goto exit;
-            }            
+            }
         }
         break;
     case UMQTT_TYPE_SUBACK:
@@ -884,7 +884,7 @@ static int umqtt_handle_readpacket(struct umqtt_client *client)
             set_uplink_recon_tick(client, UPLINK_NEXT_TICK);
 
             _ret = rt_mq_send(client->msg_queue, &msg_ack, sizeof(struct umqtt_msg_ack));
-            if (_ret != RT_EOK) 
+            if (_ret != RT_EOK)
             {
                 _ret = UMQTT_SEND_FAILED;
                 goto exit;
@@ -902,7 +902,7 @@ static int umqtt_handle_readpacket(struct umqtt_client *client)
             set_uplink_recon_tick(client, UPLINK_NEXT_TICK);
 
             _ret = rt_mq_send(client->msg_queue, &msg_ack, sizeof(struct umqtt_msg_ack));
-            if (_ret != RT_EOK) 
+            if (_ret != RT_EOK)
             {
                 _ret = UMQTT_SEND_FAILED;
                 goto exit;
@@ -935,16 +935,16 @@ static void umqtt_thread(void *params)
     RT_ASSERT(client);
 
     while (1) {
-        
+
         _ret = umqtt_handle_readpacket(client);
-        if (_ret == UMQTT_FIN_ACK) 
+        if (_ret == UMQTT_FIN_ACK)
         {
             LOG_W("reconnect start! stop timer -> trans disconnect delay 5000ms -> umqtt connect! ");
             rt_timer_stop(client->uplink_timer);
 
             umqtt_trans_disconnect(client->sock);
             client->sock = -1;
-            rt_thread_mdelay(5000);        
+            rt_thread_mdelay(5000);
 
             _ret = umqtt_connect(client, 1);
             if (_ret == UMQTT_RECONNECT_FAILED)
@@ -955,7 +955,7 @@ static void umqtt_thread(void *params)
         }
 
     }
- 
+
  _exit:
     LOG_I(" umqtt thread is quit! ");
     client->task_handle = RT_NULL;
@@ -964,7 +964,7 @@ static void umqtt_thread(void *params)
 
 static void umqtt_check_def_info(struct umqtt_info *info)
 {
-    if (info) 
+    if (info)
     {
         if (info->send_size == 0) { info->send_size = PKG_UMQTT_INFO_DEF_SENDSIZE; }
         if (info->recv_size == 0) { info->recv_size = PKG_UMQTT_INFO_DEF_RECVSIZE; }
@@ -992,37 +992,37 @@ static int umqtt_keepalive_callback(struct umqtt_client *client)
     _connect_kp_time = PKG_UMQTT_CONNECT_KEEPALIVE_DEF_TIME >> 1;
 #endif
 
-    if (client->connect_state == UMQTT_CS_LINKED) 
+    if (client->connect_state == UMQTT_CS_LINKED)
     {
         if (((client->uplink_next_tick <= rt_tick_get())
           && (client->uplink_next_tick > client->uplink_last_tick))
          || ((client->pingreq_last_tick + _connect_kp_time) < rt_tick_get()))
         {
             _length = umqtt_encode(UMQTT_TYPE_PINGREQ, client->send_buf, 2, NULL);
-            if (_length == 2) 
+            if (_length == 2)
                 umqtt_trans_send(client->sock, client->send_buf, _length, 0);
-            
+
             if (client->user_handler)
                 client->user_handler(client, UMQTT_EVT_HEARTBEAT);
 
             set_uplink_recon_tick(client, UPLINK_LAST_TICK);
             client->pingreq_last_tick = rt_tick_get();
-        } 
-        else if ((client->uplink_last_tick >= client->uplink_next_tick) 
-              && ((client->uplink_last_tick + client->mqtt_info.send_timeout * 1000) < rt_tick_get())) 
+        }
+        else if ((client->uplink_last_tick >= client->uplink_next_tick)
+              && ((client->uplink_last_tick + client->mqtt_info.send_timeout * 1000) < rt_tick_get()))
         {
             if (++client->keepalive_count >=  client->mqtt_info.keepalive_max_num) {
                 set_connect_status(client, UMQTT_CS_UNLINK);
-            } 
-            else 
+            }
+            else
             {
                 _length = umqtt_encode(UMQTT_TYPE_PINGREQ, client->send_buf, 2, NULL);
-                if (_length == 2) 
+                if (_length == 2)
                     umqtt_trans_send(client->sock, client->send_buf, _length, 0);
-                
+
                 if (client->user_handler)
                     client->user_handler(client, UMQTT_EVT_HEARTBEAT);
-                
+
                 set_uplink_recon_tick(client, UPLINK_LAST_TICK);
             }
         }
@@ -1034,24 +1034,24 @@ static int umqtt_reconnect_callback(struct umqtt_client *client)
 {
     int _ret = 0;
     RT_ASSERT(client);
- 
-    if (client->connect_state == UMQTT_CS_UNLINK) 
+
+    if (client->connect_state == UMQTT_CS_UNLINK)
     {
-        if (client->user_handler) 
+        if (client->user_handler)
             client->user_handler(client, UMQTT_EVT_OFFLINE);
-        
+
         set_connect_status(client, UMQTT_CS_UNLINK_LINKING);
         umqtt_trans_disconnect(client->sock);
-        client->sock = -1;        
+        client->sock = -1;
 
-    } 
-    else if (client->connect_state == UMQTT_CS_UNLINK_LINKING) 
-    {    
-        if (client->reconnect_next_tick <= rt_tick_get()) 
+    }
+    else if (client->connect_state == UMQTT_CS_UNLINK_LINKING)
+    {
+        if (client->reconnect_next_tick <= rt_tick_get())
         {
             if (client->sock < 0)
             {
-                if (client->reconnect_count >= client->mqtt_info.reconnect_max_num) 
+                if (client->reconnect_count >= client->mqtt_info.reconnect_max_num)
                 {
                     set_connect_status(client, UMQTT_CS_DISCONNECT);
                     /* stop timer, delete task handle */
@@ -1060,12 +1060,12 @@ static int umqtt_reconnect_callback(struct umqtt_client *client)
                         rt_thread_delete(client->task_handle);
                         client->task_handle = RT_NULL;
                     }
-                    if (client->uplink_timer) 
+                    if (client->uplink_timer)
                     {
                         rt_timer_stop(client->uplink_timer);
                     }
-                } 
-                else 
+                }
+                else
                 {
                     client->keepalive_count = 0;
                     set_uplink_recon_tick(client, RECON_NEXT_TICK);
@@ -1074,7 +1074,7 @@ static int umqtt_reconnect_callback(struct umqtt_client *client)
                         client->user_handler(client, UMQTT_EVT_LINK);
                 }
             }
-            else 
+            else
             {
                 umqtt_trans_disconnect(client->sock);
                 client->sock = -1;
@@ -1094,7 +1094,7 @@ static void umqtt_uplink_timer_callback(void *params)
     pubrec_cycle_callback(client);
 }
 
-/** 
+/**
  * delete the umqtt client, release resources
  *
  * @param client the input, umqtt client
@@ -1103,7 +1103,7 @@ static void umqtt_uplink_timer_callback(void *params)
  *         =0: success
  */
 int umqtt_delete(struct umqtt_client *client)
-{   
+{
     int _ret = 0, _cnt = 0;
     struct subtop_recv_handler *p_subtop = RT_NULL;
     struct umqtt_qos2_msg *p_msg = RT_NULL;
@@ -1123,18 +1123,18 @@ int umqtt_delete(struct umqtt_client *client)
         rt_timer_delete(client->uplink_timer);
         client->uplink_timer = RT_NULL;
     }
-    if (client->msg_queue) 
+    if (client->msg_queue)
     {
         rt_mq_delete(client->msg_queue);
         client->msg_queue = RT_NULL;
     }
     client->send_len = client->recv_len = 0;
-    if (client->lock_client) 
+    if (client->lock_client)
     {
         rt_mutex_delete(client->lock_client);
         client->lock_client = RT_NULL;
     }
-    if (client->recv_buf) 
+    if (client->recv_buf)
     {
         rt_free(client->recv_buf);
         client->recv_buf = RT_NULL;
@@ -1178,12 +1178,12 @@ int umqtt_delete(struct umqtt_client *client)
         client->pubrec_msg[_cnt].next_tick = -1;
     }
 
-    rt_list_remove(&(client->list));       /* delete this list  */ 
+    rt_list_remove(&(client->list));       /* delete this list  */
     rt_free(client);
     _ret = UMQTT_OK;
     return _ret;
 }
-/** 
+/**
  * create umqtt client according to user information
  *
  * @param info the input, user config information
@@ -1201,7 +1201,7 @@ umqtt_client_t umqtt_create(const struct umqtt_info *info)
     char _name[RT_NAME_MAX];
 
     mqtt_client = (umqtt_client_t)rt_calloc(1, sizeof(struct umqtt_client));
-    if (mqtt_client == RT_NULL) 
+    if (mqtt_client == RT_NULL)
     {
         LOG_E(" umqtt create failed!");
         _ret = UMQTT_MEM_FULL;
@@ -1209,7 +1209,7 @@ umqtt_client_t umqtt_create(const struct umqtt_info *info)
     }
     rt_memcpy(&(mqtt_client->mqtt_info), info, sizeof(struct umqtt_info));
     umqtt_check_def_info(&(mqtt_client->mqtt_info));
-    
+
     /* will topic/message send/recv*/
     mqtt_client->sub_recv_list_len = PKG_UMQTT_SUBRECV_DEF_LENGTH;
     rt_list_init(&mqtt_client->sub_recv_list);
@@ -1238,7 +1238,7 @@ umqtt_client_t umqtt_create(const struct umqtt_info *info)
     }
 
     mqtt_client->recv_buf = rt_calloc(1, sizeof(rt_uint8_t) * mqtt_client->mqtt_info.recv_size);
-    if (mqtt_client->recv_buf == RT_NULL) 
+    if (mqtt_client->recv_buf == RT_NULL)
     {
         LOG_E(" client receive buff calloc failed!");
         _ret = UMQTT_MEM_FULL;
@@ -1246,7 +1246,7 @@ umqtt_client_t umqtt_create(const struct umqtt_info *info)
     }
 
     mqtt_client->send_buf = rt_calloc(1, sizeof(rt_uint8_t) * mqtt_client->mqtt_info.send_size);
-    if (mqtt_client->send_buf == RT_NULL) 
+    if (mqtt_client->send_buf == RT_NULL)
     {
         LOG_E(" client send buff calloc failed!");
         _ret = UMQTT_MEM_FULL;
@@ -1256,7 +1256,7 @@ umqtt_client_t umqtt_create(const struct umqtt_info *info)
     rt_memset(_name, 0x00, sizeof(_name));
     rt_snprintf(_name, RT_NAME_MAX, "umqtt_l%d", lock_cnt);
     mqtt_client->lock_client = rt_mutex_create(_name, RT_IPC_FLAG_FIFO);
-    if (mqtt_client->lock_client == RT_NULL) 
+    if (mqtt_client->lock_client == RT_NULL)
     {
         LOG_E(" create lock_client failed!");
         _ret = UMQTT_MEM_FULL;
@@ -1265,11 +1265,11 @@ umqtt_client_t umqtt_create(const struct umqtt_info *info)
 
     rt_memset(_name, 0x00, sizeof(_name));
     rt_snprintf(_name, RT_NAME_MAX, "umqtt_q%d", lock_cnt);
-    mqtt_client->msg_queue = rt_mq_create(_name, 
-                                            sizeof(struct umqtt_msg_ack), 
-                                            PKG_UMQTT_MSG_QUEUE_ACK_DEF_SIZE, 
+    mqtt_client->msg_queue = rt_mq_create(_name,
+                                            sizeof(struct umqtt_msg_ack),
+                                            PKG_UMQTT_MSG_QUEUE_ACK_DEF_SIZE,
                                             RT_IPC_FLAG_FIFO);
-    if (mqtt_client->msg_queue == RT_NULL) 
+    if (mqtt_client->msg_queue == RT_NULL)
     {
         LOG_E(" create msg_queue failed!");
         _ret = UMQTT_MEM_FULL;
@@ -1278,30 +1278,30 @@ umqtt_client_t umqtt_create(const struct umqtt_info *info)
 
     rt_memset(_name, 0x00, sizeof(_name));
     rt_snprintf(_name, RT_NAME_MAX, "umqtt_m%d", lock_cnt);
-    mqtt_client->uplink_timer = rt_timer_create(_name, 
-                                                umqtt_uplink_timer_callback, 
-                                                mqtt_client, 
-                                                UMQTT_INFO_DEF_UPLINK_TIMER_TICK, 
+    mqtt_client->uplink_timer = rt_timer_create(_name,
+                                                umqtt_uplink_timer_callback,
+                                                mqtt_client,
+                                                UMQTT_INFO_DEF_UPLINK_TIMER_TICK,
                                                 RT_TIMER_FLAG_SOFT_TIMER | RT_TIMER_FLAG_PERIODIC);
-    if (mqtt_client->uplink_timer == RT_NULL) 
+    if (mqtt_client->uplink_timer == RT_NULL)
     {
         LOG_E(" create uplink timer failed!");
         _ret = UMQTT_MEM_FULL;
         goto exit;
     }
 
-    rt_list_init(&mqtt_client->list);           /* objects, multi mqttclient */ 
+    rt_list_init(&mqtt_client->list);           /* objects, multi mqttclient */
 
     rt_memset(_name, 0x00, sizeof(_name));
     rt_snprintf(_name, RT_NAME_MAX, "umqtt_t%d", lock_cnt++);
-    
-    mqtt_client->task_handle = rt_thread_create(_name, 
-                                                umqtt_thread, 
-                                                (void *)mqtt_client, 
-                                                mqtt_client->mqtt_info.thread_stack_size, 
-                                                mqtt_client->mqtt_info.thread_priority, 
+
+    mqtt_client->task_handle = rt_thread_create(_name,
+                                                umqtt_thread,
+                                                (void *)mqtt_client,
+                                                mqtt_client->mqtt_info.thread_stack_size,
+                                                mqtt_client->mqtt_info.thread_priority,
                                                 UMQTT_INFO_DEF_THREAD_TICK);
-    if (mqtt_client->task_handle == RT_NULL) 
+    if (mqtt_client->task_handle == RT_NULL)
     {
         LOG_E(" create thread failed!");
         _ret = UMQTT_MEM_FULL;
@@ -1309,7 +1309,7 @@ umqtt_client_t umqtt_create(const struct umqtt_info *info)
     }
 
 exit:
-    if (_ret < 0) 
+    if (_ret < 0)
     {
         umqtt_delete(mqtt_client);
         mqtt_client = RT_NULL;
@@ -1317,7 +1317,7 @@ exit:
     return mqtt_client;
 }
 
-/** 
+/**
  * start the umqtt client to work
  *
  * @param client the input, umqtt client
@@ -1344,14 +1344,14 @@ int umqtt_start(struct umqtt_client *client)
     if (_ret < 0)
         goto exit;
 
-    if (client->task_handle) 
+    if (client->task_handle)
     {
         rt_thread_startup(client->task_handle);
     }
 
     if (client->uplink_timer)
     {
-        if (rt_timer_start(client->uplink_timer) != RT_EOK) 
+        if (rt_timer_start(client->uplink_timer) != RT_EOK)
         {
             _ret = UMQTT_FAILED;
             LOG_E(" timer start failed!");
@@ -1427,7 +1427,7 @@ exit:
     return _ret;
 }
 
-/** 
+/**
  * stop the umqtt client to work
  *
  * @param client the input, umqtt client
@@ -1446,9 +1446,9 @@ void umqtt_stop(struct umqtt_client *client)
         client->task_handle = RT_NULL;
     }
 
-    if (client->uplink_timer) 
+    if (client->uplink_timer)
         rt_timer_stop(client->uplink_timer);
-    
+
     umqtt_disconnect(client);
     if (client->sock != -1)
     {
@@ -1457,7 +1457,7 @@ void umqtt_stop(struct umqtt_client *client)
     }
 }
 
-/** 
+/**
  * Client to send a publish message to the broker
  *
  * @param client the input, umqtt client
@@ -1493,7 +1493,7 @@ int umqtt_publish(struct umqtt_client *client, enum umqtt_qos qos, const char *t
     encode_msg.msg.publish.topic_name = topic;
     encode_msg.msg.publish.topic_name_len = strlen(topic);
     _length = umqtt_encode(UMQTT_TYPE_PUBLISH, client->send_buf, client->mqtt_info.send_size, &encode_msg);
-    if (_length <= 0) 
+    if (_length <= 0)
     {
         _ret = UMQTT_ENCODE_ERROR;
         LOG_E(" publish encode failed! topic: %d", topic);
@@ -1503,33 +1503,33 @@ int umqtt_publish(struct umqtt_client *client, enum umqtt_qos qos, const char *t
 
 _republish:
     _ret = umqtt_trans_send(client->sock, client->send_buf, client->send_len, client->mqtt_info.send_timeout);
-    if (_ret < 0) 
+    if (_ret < 0)
     {
         _ret = UMQTT_SEND_FAILED;
         LOG_E(" publish trans send failed!");
         goto exit;
     }
     _ret = UMQTT_OK;
-    if (qos == UMQTT_QOS1) 
+    if (qos == UMQTT_QOS1)
     {
-        if (RT_EOK == rt_mq_recv(client->msg_queue, 
-                                &msg_ack, sizeof(struct umqtt_msg_ack), 
-                                rt_tick_from_millisecond(timeout))) 
+        if (RT_EOK == rt_mq_recv(client->msg_queue,
+                                &msg_ack, sizeof(struct umqtt_msg_ack),
+                                rt_tick_from_millisecond(timeout)))
         {
-            if (msg_ack.msg_type == UMQTT_TYPE_PUBACK) 
+            if (msg_ack.msg_type == UMQTT_TYPE_PUBACK)
             {
                 _ret = UMQTT_OK;
                 LOG_I(" publish qos1 ack success!");
                 goto exit;
-            } 
-            else 
+            }
+            else
             {
                 _ret = UMQTT_READ_ERROR;
                 LOG_E(" publish qos1 msg_type(%d) error!", msg_ack.msg_type);
                 goto exit;
             }
-        } 
-        else 
+        }
+        else
         {
             if (++_cnt >= PKG_UMQTT_PUBLISH_RECON_MAX)
             {
@@ -1544,12 +1544,12 @@ _republish:
             }
 
         }
-    } 
-    else if (qos == UMQTT_QOS2) 
+    }
+    else if (qos == UMQTT_QOS2)
     {
-        if (RT_EOK == rt_mq_recv(client->msg_queue, 
-                                &msg_ack, sizeof(struct umqtt_msg_ack), 
-                                rt_tick_from_millisecond(timeout))) 
+        if (RT_EOK == rt_mq_recv(client->msg_queue,
+                                &msg_ack, sizeof(struct umqtt_msg_ack),
+                                rt_tick_from_millisecond(timeout)))
         {
             if (msg_ack.msg_type == UMQTT_TYPE_PUBREC)
             {
@@ -1559,10 +1559,10 @@ _republish:
             {
                 _ret = UMQTT_READ_ERROR;
                 LOG_E(" publish qos2 msg_type(%d) error!", msg_ack.msg_type);
-                goto exit;                
+                goto exit;
             }
         }
-        else 
+        else
         {
             if (++_cnt >= PKG_UMQTT_PUBLISH_RECON_MAX)
             {
@@ -1585,41 +1585,41 @@ _repubrel:
         encode_msg.header.bits.dup = 0;
         encode_msg.msg.publish.packet_id = packet_id;
         _length = umqtt_encode(encode_msg.header.bits.type, client->send_buf, client->mqtt_info.send_size, &encode_msg);
-        if (_length <= 0) 
+        if (_length <= 0)
         {
             _ret = UMQTT_ENCODE_ERROR;
             LOG_E(" pubrel encode failed! topic: %d", topic);
             goto exit;
         }
-        client->send_len = _length;        
+        client->send_len = _length;
 
-        _ret = umqtt_trans_send(client->sock, client->send_buf, client->send_len, 
+        _ret = umqtt_trans_send(client->sock, client->send_buf, client->send_len,
                                 client->mqtt_info.send_timeout);
-        if (_ret < 0) 
+        if (_ret < 0)
         {
             _ret = UMQTT_SEND_FAILED;
             LOG_E(" publish trans send failed!");
             goto exit;
         }
-        _ret = UMQTT_OK;        
+        _ret = UMQTT_OK;
 
-        if (RT_EOK == rt_mq_recv(client->msg_queue, 
-                                &msg_ack, sizeof(struct umqtt_msg_ack), 
-                                rt_tick_from_millisecond(timeout))) 
+        if (RT_EOK == rt_mq_recv(client->msg_queue,
+                                &msg_ack, sizeof(struct umqtt_msg_ack),
+                                rt_tick_from_millisecond(timeout)))
         {
-            if (msg_ack.msg_type == UMQTT_TYPE_PUBCOMP) 
+            if (msg_ack.msg_type == UMQTT_TYPE_PUBCOMP)
             {
                 _ret = UMQTT_OK;
                 LOG_I(" pubcomp ack! publish qos2 ack success!");
                 goto exit;
-            } 
-            else 
+            }
+            else
             {
                 _ret = UMQTT_READ_ERROR;
                 LOG_E(" publish qos2 msg_type(%d) error!", msg_ack.msg_type);
                 goto exit;
             }
-        }        
+        }
         else
         {
             if (++_cnt >= PKG_UMQTT_PUBLISH_RECON_MAX)
@@ -1640,7 +1640,7 @@ exit:
     return _ret;
 }
 
-/** 
+/**
  * Subscribe the client to defined topic with defined qos
  *
  * @param client the input, umqtt client
@@ -1666,14 +1666,14 @@ int umqtt_subscribe(struct umqtt_client *client, const char *topic, enum umqtt_q
 
     _cnt = rt_list_isempty(&client->sub_recv_list);
 
-    if (_cnt == 0) 
+    if (_cnt == 0)
     {
         _cnt = 0;
         rt_list_for_each(node, &client->sub_recv_list)
-        {    
+        {
             p_subtop = rt_list_entry(node, struct subtop_recv_handler, next_list);
-            if (p_subtop->topicfilter 
-            && (rt_strcmp(p_subtop->topicfilter, topic) == 0)) 
+            if (p_subtop->topicfilter
+            && (rt_strcmp(p_subtop->topicfilter, topic) == 0))
             {
                 LOG_D(" subscribe topic(%s) is already subscribed.", topic);
                 goto exit;
@@ -1682,13 +1682,13 @@ int umqtt_subscribe(struct umqtt_client *client, const char *topic, enum umqtt_q
         _length = rt_list_len(&client->sub_recv_list);
     }
 
-    if (_length > client->sub_recv_list_len) 
+    if (_length > client->sub_recv_list_len)
     {
         _ret = UMQTT_MEM_FULL;
         LOG_E(" subscribe size(%d) is not enough! now length(%d)!", client->sub_recv_list_len, _length);
         goto exit;
-    } 
-    else 
+    }
+    else
     {
         rt_memset(&encode_msg, 0, sizeof(encode_msg));
         encode_msg.header.bits.qos = UMQTT_QOS1;
@@ -1699,7 +1699,7 @@ int umqtt_subscribe(struct umqtt_client *client, const char *topic, enum umqtt_q
         encode_msg.msg.subscribe.topic_count = 1;
         rt_memset(client->send_buf, 0, sizeof(rt_uint8_t) * client->mqtt_info.send_size);
         _length = umqtt_encode(UMQTT_TYPE_SUBSCRIBE, client->send_buf, client->mqtt_info.send_size, &encode_msg);
-        if (_length <= 0) 
+        if (_length <= 0)
         {
             _ret = UMQTT_ENCODE_ERROR;
             LOG_E(" subscribe encode failed! topic: %s", topic);
@@ -1708,7 +1708,7 @@ int umqtt_subscribe(struct umqtt_client *client, const char *topic, enum umqtt_q
         client->send_len = _length;
 
         _ret = umqtt_trans_send(client->sock, client->send_buf, client->send_len, client->mqtt_info.send_timeout);
-        if (_ret < 0) 
+        if (_ret < 0)
         {
             _ret = UMQTT_SEND_FAILED;
             LOG_E(" subscribe trans send failed!");
@@ -1718,11 +1718,11 @@ int umqtt_subscribe(struct umqtt_client *client, const char *topic, enum umqtt_q
         set_uplink_recon_tick(client, UPLINK_LAST_TICK);
 
         rt_memset(&msg_ack, 0, sizeof(msg_ack));
-        if (RT_EOK == rt_mq_recv(client->msg_queue, 
-                                &msg_ack, sizeof(struct umqtt_msg_ack), 
-                                rt_tick_from_millisecond(client->mqtt_info.send_timeout * 1000))) 
+        if (RT_EOK == rt_mq_recv(client->msg_queue,
+                                &msg_ack, sizeof(struct umqtt_msg_ack),
+                                rt_tick_from_millisecond(client->mqtt_info.send_timeout * 1000)))
         {
-            if (msg_ack.msg_type == UMQTT_TYPE_SUBACK) 
+            if (msg_ack.msg_type == UMQTT_TYPE_SUBACK)
             {
                 p_subtop = RT_NULL;
                 p_subtop = (struct subtop_recv_handler *)rt_calloc(1, sizeof(struct subtop_recv_handler));
@@ -1730,7 +1730,7 @@ int umqtt_subscribe(struct umqtt_client *client, const char *topic, enum umqtt_q
                 LOG_D(" start assign datas !");
                 p_subtop->topicfilter = rt_strdup(topic);
                 p_subtop->qos = qos;
-                if (callback) 
+                if (callback)
                 {
                     p_subtop->callback = callback;
                 }
@@ -1740,15 +1740,15 @@ int umqtt_subscribe(struct umqtt_client *client, const char *topic, enum umqtt_q
                 _ret = UMQTT_OK;
                 LOG_I("subscribe ack ok! ");
                 goto exit;
-            } 
-            else 
+            }
+            else
             {
                 _ret = UMQTT_READ_ERROR;
                 LOG_E("subscribe ack error!");
                 goto exit;
             }
-        } 
-        else 
+        }
+        else
         {
             _ret = UMQTT_READ_FAILED;
             LOG_E(" subscribe recv message timeout! topic: %s", topic);
@@ -1760,7 +1760,7 @@ exit:
     return _ret;
 }
 
-/** 
+/**
  * Unsubscribe the client from defined topic
  *
  * @param client the input, umqtt client
@@ -1789,7 +1789,7 @@ int umqtt_unsubscribe(struct umqtt_client *client, const char *topic)
             p_subtop = rt_list_entry(node, struct subtop_recv_handler, next_list);
             _cnt--;
             if (p_subtop->topicfilter
-            && (rt_strncmp(p_subtop->topicfilter, topic, strlen(topic)) == 0)) 
+            && (rt_strncmp(p_subtop->topicfilter, topic, strlen(topic)) == 0))
             {
                 rt_memset(&encode_msg, 0, sizeof(encode_msg));
                 encode_msg.header.bits.qos = UMQTT_QOS1;
@@ -1798,7 +1798,7 @@ int umqtt_unsubscribe(struct umqtt_client *client, const char *topic)
                 encode_msg.msg.unsubscribe.topic_filter[0].topic_filter = topic,
                 encode_msg.msg.unsubscribe.topic_filter[0].filter_len = strlen(topic);
                 _length = umqtt_encode(UMQTT_TYPE_UNSUBSCRIBE, client->send_buf, client->mqtt_info.send_size, &encode_msg);
-                if (_length <= 0) 
+                if (_length <= 0)
                 {
                     _ret = UMQTT_ENCODE_ERROR;
                     LOG_E(" unsubscribe encode failed! topic: %s", topic);
@@ -1807,7 +1807,7 @@ int umqtt_unsubscribe(struct umqtt_client *client, const char *topic)
                 client->send_len = _length;
 
                 _ret = umqtt_trans_send(client->sock, client->send_buf, client->send_len, client->mqtt_info.send_timeout);
-                if (_ret < 0) 
+                if (_ret < 0)
                 {
                     _ret = UMQTT_SEND_FAILED;
                     LOG_E(" unsubscribe trans send failed!");
@@ -1817,11 +1817,11 @@ int umqtt_unsubscribe(struct umqtt_client *client, const char *topic)
                 set_uplink_recon_tick(client, UPLINK_LAST_TICK);
 
                 rt_memset(&msg_ack, 0, sizeof(msg_ack));
-                if (RT_EOK == rt_mq_recv(client->msg_queue, 
-                                        &msg_ack, sizeof(struct umqtt_msg_ack), 
-                                        rt_tick_from_millisecond(client->mqtt_info.send_timeout * 1000))) 
+                if (RT_EOK == rt_mq_recv(client->msg_queue,
+                                        &msg_ack, sizeof(struct umqtt_msg_ack),
+                                        rt_tick_from_millisecond(client->mqtt_info.send_timeout * 1000)))
                 {
-                    if (msg_ack.msg_type == UMQTT_TYPE_UNSUBACK) 
+                    if (msg_ack.msg_type == UMQTT_TYPE_UNSUBACK)
                     {
                         if (p_subtop->topicfilter) {
                             rt_free(p_subtop->topicfilter);
@@ -1835,15 +1835,15 @@ int umqtt_unsubscribe(struct umqtt_client *client, const char *topic)
                         _ret = UMQTT_OK;
                         LOG_I(" unsubscribe ack ok! ");
                         goto exit;
-                    } 
-                    else 
+                    }
+                    else
                     {
                         _ret = UMQTT_READ_ERROR;
                         LOG_E(" unsubscribe ack error!");
                         goto exit;
                     }
-                } 
-                else 
+                }
+                else
                 {
                     _ret = UMQTT_TIMEOUT;
                     LOG_E(" unsubscribe recv message timeout! topic: %s", topic);
@@ -1853,7 +1853,7 @@ int umqtt_unsubscribe(struct umqtt_client *client, const char *topic)
         }
 
     }
-    else 
+    else
     {
         LOG_D(" unsubscribe topic(%s) is not exit!", topic);
     }
@@ -1862,7 +1862,7 @@ exit:
     return _ret;
 }
 
-/** 
+/**
  * umqtt client publish nonblocking datas
  *
  * @param client the input, umqtt client
@@ -1870,11 +1870,11 @@ exit:
  * @param topic the input, topic string
  * @param payload the input, mqtt message payload
  * @param length the input, mqtt message payload length
- * 
+ *
  * @return < 0: failed
  *         >= 0: success
  */
-int umqtt_publish_async(struct umqtt_client *client, enum umqtt_qos qos, const char *topic, 
+int umqtt_publish_async(struct umqtt_client *client, enum umqtt_qos qos, const char *topic,
                         void *payload, size_t length)
 {
     int _ret = 0, _length = 0;
@@ -1885,7 +1885,7 @@ int umqtt_publish_async(struct umqtt_client *client, enum umqtt_qos qos, const c
     RT_ASSERT(topic);
     RT_ASSERT(payload);
     RT_ASSERT(length);
-    
+
     packet_id = ((qos == UMQTT_QOS0) ? 0 : get_next_packetID(client));
 
     encode_msg.header.bits.qos = qos;
@@ -1896,7 +1896,7 @@ int umqtt_publish_async(struct umqtt_client *client, enum umqtt_qos qos, const c
     encode_msg.msg.publish.topic_name = topic;
     encode_msg.msg.publish.topic_name_len = strlen(topic);
     _length = umqtt_encode(UMQTT_TYPE_PUBLISH, client->send_buf, client->mqtt_info.send_size, &encode_msg);
-    if (_length <= 0) 
+    if (_length <= 0)
     {
         _ret = UMQTT_ENCODE_ERROR;
         LOG_E(" publish encode failed! topic: %d", topic);
@@ -1905,7 +1905,7 @@ int umqtt_publish_async(struct umqtt_client *client, enum umqtt_qos qos, const c
     client->send_len = _length;
 
     _ret = umqtt_trans_send(client->sock, client->send_buf, client->send_len, client->mqtt_info.send_timeout);
-    if (_ret < 0) 
+    if (_ret < 0)
     {
         _ret = UMQTT_SEND_FAILED;
         LOG_E(" publish trans send failed!");
@@ -1918,13 +1918,13 @@ exit:
     return _ret;
 }
 
-/** 
+/**
  * umqtt client publish nonblocking datas
  *
  * @param client the input, umqtt client
  * @param cmd the input, UMQTT_CMD_SUB_CB / UMQTT_CMD_EVT_CB
  * @param params the input, params according to cmd
- * 
+ *
  */
 int umqtt_control(struct umqtt_client *client, enum umqtt_cmd cmd, void *params)
 {
@@ -1987,7 +1987,7 @@ int umqtt_control(struct umqtt_client *client, enum umqtt_cmd cmd, void *params)
             umqtt_disconnect(client);
         }
         break;
-#ifdef PKG_UMQTT_TEST_SHORT_KEEPALIVE_TIME 
+#ifdef PKG_UMQTT_TEST_SHORT_KEEPALIVE_TIME
     case UMQTT_CMD_SET_CON_KP:
         {
             client->mqtt_info.connect_keepalive_sec = (rt_uint16_t *)params;
