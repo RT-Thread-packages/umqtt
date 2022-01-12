@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2006-2020, RT-Thread Development Team
+ * Copyright (c) 2006-2022, RT-Thread Development Team
  *
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -24,7 +24,7 @@
 #include "umqtt.h"
 #include "umqtt_internal.h"
 
-// #define MQTT_URI                "tcp://test.mosquitto.org:1883" 
+// #define MQTT_URI                "tcp://test.mosquitto.org:1883"
 // #define MQTT_URI                "tcp://mq.tongxinmao.com:18831"
 #define MQTT_URI                "tcp://192.168.12.83:1883"
 #define MQTT_SUBTOPIC           "/umqtt/test"
@@ -86,7 +86,7 @@ static int umqtt_ex_start(int argc, char **argv)
     if (is_started)
     {
         LOG_E(" umqtt client is already connected.");
-        return -1;        
+        return -1;
     }
 
     struct umqtt_info umqtt_info = { 0 };
@@ -125,11 +125,11 @@ static int umqtt_ex_stop(int argc, char **argv)
     }
 
     is_started = 0;
-    
+
     umqtt_stop(m_umqtt_client);
     umqtt_delete(m_umqtt_client);
     m_umqtt_client = RT_NULL;
-    
+
     return 0;
 }
 
@@ -155,7 +155,7 @@ static int umqtt_ex_publish(int argc, char **argv)
         LOG_E("mqtt client is not connected.");
         return -1;
     }
-	
+
     if (argc == 4) {
         int _len = str_to_int(argv[2]);
         // LOG_D(" *argv[0]: %s, *argv[1]: %s, *argv[2]: %d, *argv[3]: %s ", argv[0], argv[1], _len, argv[3]);
@@ -177,8 +177,8 @@ static int umqtt_ex_subscribe(int argc, char **argv)
         LOG_E("umqtt_subscribe [topic]  --send an umqtt subscribe packet and wait for suback before returning.\n");
         return -1;
     }
-	
-	if (is_started == 0)
+
+    if (is_started == 0)
     {
         LOG_E("umqtt client is not connected.");
         return -1;
@@ -197,8 +197,8 @@ static int umqtt_ex_unsubscribe(int argc, char **argv)
         LOG_E("mqtt_unsubscribe [topic]  --send an mqtt unsubscribe packet and wait for suback before returning.\n");
         return -1;
     }
-	
-	if (is_started == 0)
+
+    if (is_started == 0)
     {
         LOG_E("mqtt client is not connected.");
         return -1;

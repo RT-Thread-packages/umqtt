@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2006-2020, RT-Thread Development Team
+ * Copyright (c) 2006-2022, RT-Thread Development Team
  *
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -59,169 +59,169 @@ enum umqtt_connack_retcode
 
 union umqtt_pkgs_fix_header
 {
-    rt_uint8_t byte;                                /* header */ 
-    struct {        
-        rt_uint8_t retain: 1;                       /* reserved bits */ 
-        rt_uint8_t qos:    2;                       /* QoS, 0-Almost once; 1-Alteast once; 2-Exactly once */ 
-        rt_uint8_t dup:    1;                       /* dup flag */ 
-        rt_uint8_t type:   4;                       /* MQTT packet type */ 
+    rt_uint8_t byte;                                /* header */
+    struct {
+        rt_uint8_t retain: 1;                       /* reserved bits */
+        rt_uint8_t qos:    2;                       /* QoS, 0-Almost once; 1-Alteast once; 2-Exactly once */
+        rt_uint8_t dup:    1;                       /* dup flag */
+        rt_uint8_t type:   4;                       /* MQTT packet type */
     } bits;
 };
 union umqtt_pkgs_connect_sign
 {
     rt_uint8_t connect_sign;
     struct {
-        rt_uint8_t reserved:       1;               /* reserved bits */ 
-        rt_uint8_t clean_session:  1;               /* clean session bit */ 
-        rt_uint8_t will_flag:      1;               /* will flag bit */ 
-        rt_uint8_t will_Qos:       2;               /* will Qos bit */ 
-        rt_uint8_t will_retain:    1;               /* will retain bit */ 
-        rt_uint8_t password_flag:  1;               /* password flag bit */ 
-        rt_uint8_t username_flag:  1;               /* user name flag bit */ 
+        rt_uint8_t reserved:       1;               /* reserved bits */
+        rt_uint8_t clean_session:  1;               /* clean session bit */
+        rt_uint8_t will_flag:      1;               /* will flag bit */
+        rt_uint8_t will_Qos:       2;               /* will Qos bit */
+        rt_uint8_t will_retain:    1;               /* will retain bit */
+        rt_uint8_t password_flag:  1;               /* password flag bit */
+        rt_uint8_t username_flag:  1;               /* user name flag bit */
     } bits;
 };
 union umqtt_pkgs_connack_sign
 {
     rt_uint8_t connack_sign;
     struct {
-        rt_uint8_t sp:             1;               /* current session bit */ 
-        rt_uint8_t reserved:       7;               /* retain bit */ 
+        rt_uint8_t sp:             1;               /* current session bit */
+        rt_uint8_t reserved:       7;               /* retain bit */
     } bits;
 };
 union pkgs_request_qos
 {
     rt_uint8_t request_qos;
     struct {
-        rt_uint8_t qos:            2;               /* QoS - 0/1/2 */ 
-        rt_uint8_t reserved:       6;               /* retain bit */ 
+        rt_uint8_t qos:            2;               /* QoS - 0/1/2 */
+        rt_uint8_t reserved:       6;               /* retain bit */
     } bits;
 };
 struct sub_topic_filter
 {
-    rt_uint16_t filter_len;                         /* topic filter length */ 
-    const char *topic_filter;                       /* topic name filter */ 
-    union pkgs_request_qos req_qos;                 /* request QoS */ 
+    rt_uint16_t filter_len;                         /* topic filter length */
+    const char *topic_filter;                       /* topic name filter */
+    union pkgs_request_qos req_qos;                 /* request QoS */
 };
 struct unsub_topic_filter
 {
-    rt_uint16_t filter_len;                         /* topic filter length */ 
-    const char *topic_filter;                       /* topic filter */ 
+    rt_uint16_t filter_len;                         /* topic filter length */
+    const char *topic_filter;                       /* topic filter */
 };
 struct umqtt_pkgs_connect
 {
-    /* variable header */ 
-    rt_uint16_t protocol_name_len;                  /* protocol name length */ 
+    /* variable header */
+    rt_uint16_t protocol_name_len;                  /* protocol name length */
     const char *protocol_name;                      /* protocol name */
-    rt_uint8_t protocol_level;                      /* protocol level */ 
-    union umqtt_pkgs_connect_sign connect_flags;    /* connect flags */ 
-    rt_uint16_t keepalive_interval_sec;             /* keepalive interval second */ 
-    /* payload */ 
-    const char *client_id;                          /* client id */ 
-    const char *will_topic;                         /* will topic */ 
-    const char *will_message;                       /* will messagewill message */ 
-    const char *user_name;                          /* user name */ 
-    rt_uint16_t password_len;                       /* password length */ 
-    const char *password;                           /* password */ 
+    rt_uint8_t protocol_level;                      /* protocol level */
+    union umqtt_pkgs_connect_sign connect_flags;    /* connect flags */
+    rt_uint16_t keepalive_interval_sec;             /* keepalive interval second */
+    /* payload */
+    const char *client_id;                          /* client id */
+    const char *will_topic;                         /* will topic */
+    const char *will_message;                       /* will messagewill message */
+    const char *user_name;                          /* user name */
+    rt_uint16_t password_len;                       /* password length */
+    const char *password;                           /* password */
 };
 struct umqtt_pkgs_connack
 {
-    /* variable header */ 
-    union umqtt_pkgs_connack_sign connack_flags;    /* connect flags */ 
-    enum umqtt_connack_retcode ret_code;            /* connect return code */ 
-    /* payload = NULL */ 
+    /* variable header */
+    union umqtt_pkgs_connack_sign connack_flags;    /* connect flags */
+    enum umqtt_connack_retcode ret_code;            /* connect return code */
+    /* payload = NULL */
 };
 struct umqtt_pkgs_publish
-{   
-    /* variable header */ 
-    rt_uint16_t topic_name_len;                     /* topic name length */ 
-    const char *topic_name;                         /* topic name */ 
-    rt_uint16_t packet_id;                          /* packet id */ 
-    /* payload */ 
-    const char *payload;                            /* active payload */ 
-    /* not packet datas */ 
-    rt_uint32_t payload_len;                        /* retain payload length */ 
+{
+    /* variable header */
+    rt_uint16_t topic_name_len;                     /* topic name length */
+    const char *topic_name;                         /* topic name */
+    rt_uint16_t packet_id;                          /* packet id */
+    /* payload */
+    const char *payload;                            /* active payload */
+    /* not packet datas */
+    rt_uint32_t payload_len;                        /* retain payload length */
 };
 struct umqtt_pkgs_puback
 {
-    /* variable header */ 
-    rt_uint16_t packet_id;                          /* packet id */ 
-    /* payload = NULL */ 
+    /* variable header */
+    rt_uint16_t packet_id;                          /* packet id */
+    /* payload = NULL */
 };
-struct umqtt_pkgs_pubrec                            /* publish receive (QoS 2, step_1st) */ 
+struct umqtt_pkgs_pubrec                            /* publish receive (QoS 2, step_1st) */
 {
-    /* variable header */ 
-    rt_uint16_t packet_id;                          /* packet id */ 
-    /* payload = NULL */ 
+    /* variable header */
+    rt_uint16_t packet_id;                          /* packet id */
+    /* payload = NULL */
 };
-struct umqtt_pkgs_pubrel                            /* publish release (QoS 2, step_2nd) */ 
+struct umqtt_pkgs_pubrel                            /* publish release (QoS 2, step_2nd) */
 {
-    /* variable header */ 
-    rt_uint16_t packet_id;                          /* packet id */ 
-    /* payload = NULL */ 
+    /* variable header */
+    rt_uint16_t packet_id;                          /* packet id */
+    /* payload = NULL */
 };
-struct umqtt_pkgs_pubcomp                           /* publish complete (QoS 2, step_3rd) */ 
+struct umqtt_pkgs_pubcomp                           /* publish complete (QoS 2, step_3rd) */
 {
-    /* variable header */ 
-    rt_uint16_t packet_id;                          /* packet id */ 
-    /* payload = NULL */ 
+    /* variable header */
+    rt_uint16_t packet_id;                          /* packet id */
+    /* payload = NULL */
 };
-struct umqtt_pkgs_subscribe                         /* subscribe topic */ 
+struct umqtt_pkgs_subscribe                         /* subscribe topic */
 {
-    /* variable header */ 
-    rt_uint16_t packet_id;                          /* packet id */ 
-    /* payload */ 
-    struct sub_topic_filter topic_filter[PKG_UMQTT_SUBRECV_DEF_LENGTH];          /* topic name filter arrays */ 
-    /* not payload datas */ 
-    rt_uint8_t topic_count;                         /* topic filter count */ 
+    /* variable header */
+    rt_uint16_t packet_id;                          /* packet id */
+    /* payload */
+    struct sub_topic_filter topic_filter[PKG_UMQTT_SUBRECV_DEF_LENGTH];          /* topic name filter arrays */
+    /* not payload datas */
+    rt_uint8_t topic_count;                         /* topic filter count */
 };
-struct umqtt_pkgs_suback                            /* subscribe ack */ 
-{   
-    /* variable header */ 
-    rt_uint16_t packet_id;                          /* packet id */ 
-    /* payload */ 
-    rt_uint8_t ret_qos[PKG_UMQTT_SUBRECV_DEF_LENGTH];   /* return code - enum Qos - 0/1/2 */ 
-    /* not payload datas */ 
-    rt_uint8_t topic_count;                         /* topic name count */ 
-};
-struct umqtt_pkgs_unsubscribe                       /* unsubscribe */ 
-{   
-    /* variable header */ 
-    rt_uint16_t packet_id;                          /* packet id */ 
-    /* payload */ 
-    struct unsub_topic_filter topic_filter[PKG_UMQTT_SUBRECV_DEF_LENGTH];      /* topic name filter arrays */ 
-    /* not payload datas */ 
-    rt_uint8_t topic_count;                         /* topic name count */ 
-};
-struct umqtt_pkgs_unsuback                          /* unsubscribe ack */ 
+struct umqtt_pkgs_suback                            /* subscribe ack */
 {
-    /* variable header */ 
-    rt_uint16_t packet_id;                          /* packet id */ 
-    /* payload = NULL */ 
+    /* variable header */
+    rt_uint16_t packet_id;                          /* packet id */
+    /* payload */
+    rt_uint8_t ret_qos[PKG_UMQTT_SUBRECV_DEF_LENGTH];   /* return code - enum Qos - 0/1/2 */
+    /* not payload datas */
+    rt_uint8_t topic_count;                         /* topic name count */
 };
-// struct pkgs_pingreq { }                          /* ping request = NULL */ 
-// struct pkgs_pingresp { }                         /* ping response = NULL */ 
-// struct pkgs_disconnect { }                       /* disconnect = NULL */ 
+struct umqtt_pkgs_unsubscribe                       /* unsubscribe */
+{
+    /* variable header */
+    rt_uint16_t packet_id;                          /* packet id */
+    /* payload */
+    struct unsub_topic_filter topic_filter[PKG_UMQTT_SUBRECV_DEF_LENGTH];      /* topic name filter arrays */
+    /* not payload datas */
+    rt_uint8_t topic_count;                         /* topic name count */
+};
+struct umqtt_pkgs_unsuback                          /* unsubscribe ack */
+{
+    /* variable header */
+    rt_uint16_t packet_id;                          /* packet id */
+    /* payload = NULL */
+};
+// struct pkgs_pingreq { }                          /* ping request = NULL */
+// struct pkgs_pingresp { }                         /* ping response = NULL */
+// struct pkgs_disconnect { }                       /* disconnect = NULL */
 
-union umqtt_pkgs_msg                                /* mqtt message packet type */ 
+union umqtt_pkgs_msg                                /* mqtt message packet type */
 {
-    struct umqtt_pkgs_connect     connect;          /* connect */ 
-    struct umqtt_pkgs_connack     connack;          /* connack */ 
-    struct umqtt_pkgs_publish     publish;          /* publish */ 
-    struct umqtt_pkgs_puback      puback;           /* puback */ 
-    struct umqtt_pkgs_pubrec      pubrec;           /* publish receive (QoS 2, step_1st) */ 
-    struct umqtt_pkgs_pubrel      pubrel;           /* publish release (QoS 2, step_2nd) */ 
-    struct umqtt_pkgs_pubcomp     pubcomp;          /* publish complete (QoS 2, step_3rd) */ 
-    struct umqtt_pkgs_subscribe   subscribe;        /* subscribe topic */ 
-    struct umqtt_pkgs_suback      suback;           /* subscribe ack */ 
-    struct umqtt_pkgs_unsubscribe unsubscribe;      /* unsubscribe topic */ 
-    struct umqtt_pkgs_unsuback    unsuback;         /* unsubscribe ack */ 
+    struct umqtt_pkgs_connect     connect;          /* connect */
+    struct umqtt_pkgs_connack     connack;          /* connack */
+    struct umqtt_pkgs_publish     publish;          /* publish */
+    struct umqtt_pkgs_puback      puback;           /* puback */
+    struct umqtt_pkgs_pubrec      pubrec;           /* publish receive (QoS 2, step_1st) */
+    struct umqtt_pkgs_pubrel      pubrel;           /* publish release (QoS 2, step_2nd) */
+    struct umqtt_pkgs_pubcomp     pubcomp;          /* publish complete (QoS 2, step_3rd) */
+    struct umqtt_pkgs_subscribe   subscribe;        /* subscribe topic */
+    struct umqtt_pkgs_suback      suback;           /* subscribe ack */
+    struct umqtt_pkgs_unsubscribe unsubscribe;      /* unsubscribe topic */
+    struct umqtt_pkgs_unsuback    unsuback;         /* unsubscribe ack */
 };
 
 struct umqtt_msg
 {
-    union umqtt_pkgs_fix_header header;             /* fix header */ 
-    rt_uint32_t msg_len;                            /* message length */ 
-    union umqtt_pkgs_msg msg;                       /* retain payload message */ 
+    union umqtt_pkgs_fix_header header;             /* fix header */
+    rt_uint32_t msg_len;                            /* message length */
+    union umqtt_pkgs_msg msg;                       /* retain payload message */
 };
 
 /* umqtt package datas */
@@ -243,37 +243,37 @@ typedef struct umqtt_pkgs_connect MQTTPacket_connectData;
 
 static void umqtt_writeChar(unsigned char** pptr, char c)
 {
-	**pptr = c;
-	(*pptr)++;
+    **pptr = c;
+    (*pptr)++;
 }
 
 static char umqtt_readChar(unsigned char** pptr)
 {
-	char c = **pptr;
-	(*pptr)++;
-	return c;
+    char c = **pptr;
+    (*pptr)++;
+    return c;
 }
 
 static void umqtt_writeInt(unsigned char** pptr, int anInt)
 {
-	**pptr = (unsigned char)(anInt / 256);
-	(*pptr)++;
-	**pptr = (unsigned char)(anInt % 256);
-	(*pptr)++;
+    **pptr = (unsigned char)(anInt / 256);
+    (*pptr)++;
+    **pptr = (unsigned char)(anInt % 256);
+    (*pptr)++;
 }
 
 static int umqtt_readInt(unsigned char** pptr)
 {
-	unsigned char* ptr = *pptr;
-	int len = 256*(*ptr) + (*(ptr+1));
-	*pptr += 2;
-	return len;
+    unsigned char* ptr = *pptr;
+    int len = 256*(*ptr) + (*(ptr+1));
+    *pptr += 2;
+    return len;
 }
 
 static void umqtt_writeCString(unsigned char** pptr, const char* string)
 {
-	int len = 0;
-    if (string) 
+    int len = 0;
+    if (string)
     {
         len = strlen(string);
         umqtt_writeInt(pptr, len);
@@ -284,15 +284,15 @@ static void umqtt_writeCString(unsigned char** pptr, const char* string)
 
 static void umqtt_writeMQTTString(unsigned char** pptr, const char* string)
 {
-	int len = 0;
-    if (string) 
+    int len = 0;
+    if (string)
     {
         len = strlen(string);
         umqtt_writeInt(pptr, len);
         memcpy(*pptr, string, len);
         *pptr += len;
-    } 
-    else 
+    }
+    else
     {
         umqtt_writeInt(pptr, 0);
     }
@@ -302,12 +302,12 @@ static int umqtt_readlenstring(int *str_len, char **p_string, unsigned char **pp
 {
     int rc = 0;
 
-    if (enddata - (*pptr) > 1) 
+    if (enddata - (*pptr) > 1)
     {
         *str_len = umqtt_readInt(pptr);
-        if (&(*pptr)[*str_len] <= enddata) 
+        if (&(*pptr)[*str_len] <= enddata)
         {
-            *p_string = (char *)*pptr; 
+            *p_string = (char *)*pptr;
             *pptr += *str_len;
             rc = 1;
         }
@@ -317,60 +317,60 @@ static int umqtt_readlenstring(int *str_len, char **p_string, unsigned char **pp
 
 static int umqtt_pkgs_encode(unsigned char* buf, int length)
 {
-	int rc = 0;
-	do {
-		char d = length % 128;
-		length /= 128;
-		/* if there are more digits to encode, set the top bit of this digit */
-		if (length > 0)
-			d |= 0x80;
-		buf[rc++] = d;
-	} while (length > 0);
-	return rc;
+    int rc = 0;
+    do {
+        char d = length % 128;
+        length /= 128;
+        /* if there are more digits to encode, set the top bit of this digit */
+        if (length > 0)
+            d |= 0x80;
+        buf[rc++] = d;
+    } while (length > 0);
+    return rc;
 }
 
 static int umqtt_pkgs_decode(int (*getcharfn)(unsigned char*, int), int* value)
 {
-	unsigned char c;
-	int multiplier = 1;
-	int len = 0;
+    unsigned char c;
+    int multiplier = 1;
+    int len = 0;
 #define MAX_NO_OF_REMAINING_LENGTH_BYTES 4
 
-	*value = 0;
-	do
-	{
-		int rc = UMQTT_READ_ERROR;
+    *value = 0;
+    do
+    {
+        int rc = UMQTT_READ_ERROR;
 
-		if (++len > MAX_NO_OF_REMAINING_LENGTH_BYTES)
-		{
-			rc = UMQTT_READ_ERROR;	/* bad data */
-			goto exit;
-		}
-		rc = (*getcharfn)(&c, 1);
-		if (rc != 1)
-			goto exit;
-		*value += (c & 127) * multiplier;
-		multiplier *= 128;
-	} while ((c & 128) != 0);
+        if (++len > MAX_NO_OF_REMAINING_LENGTH_BYTES)
+        {
+            rc = UMQTT_READ_ERROR;  /* bad data */
+            goto exit;
+        }
+        rc = (*getcharfn)(&c, 1);
+        if (rc != 1)
+            goto exit;
+        *value += (c & 127) * multiplier;
+        multiplier *= 128;
+    } while ((c & 128) != 0);
 exit:
-	return len;
+    return len;
 }
 
 static int umqtt_pkgs_len(int rem_len)
 {
-	rem_len += 1; /* header byte */
+    rem_len += 1; /* header byte */
 
-	/* now remaining_length field */
-	if (rem_len < 128)
-		rem_len += 1;
-	else if (rem_len < 16384)
-		rem_len += 2;
-	else if (rem_len < 2097151)
-		rem_len += 3;
-	else
-		rem_len += 4;
+    /* now remaining_length field */
+    if (rem_len < 128)
+        rem_len += 1;
+    else if (rem_len < 16384)
+        rem_len += 2;
+    else if (rem_len < 2097151)
+        rem_len += 3;
+    else
+        rem_len += 4;
 
-	return rem_len;
+    return rem_len;
 }
 
 #ifdef __cplusplus

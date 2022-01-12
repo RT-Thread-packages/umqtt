@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2006-2020, RT-Thread Development Team
+ * Copyright (c) 2006-2022, RT-Thread Development Team
  *
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -66,23 +66,23 @@ static int umqtt_resolve_uri(const char *umqtt_uri, struct addrinfo **res)
     uri_len = strlen(uri);
 
     /* strip protocol(tcp or ssl) */
-    if (strncmp(uri, "tcp://", 6) == 0) 
+    if (strncmp(uri, "tcp://", 6) == 0)
     {
         host_addr = uri + 6;
-    } 
-    else if (strncmp(uri, "ssl://", 6) == 0) 
+    }
+    else if (strncmp(uri, "ssl://", 6) == 0)
     {
         host_addr = uri + 6;
     // } else if (strncmp(uri, "ws://", 5) == 0) {
-    } 
-    else 
+    }
+    else
     {
         rc = UMQTT_INPARAMS_NULL;
         goto exit;
     }
 
     if (host_addr[0] == '[')    /* ipv6 address */
-    {  
+    {
         host_addr += 1;
         ptr = strstr(host_addr, "]");
         if (!ptr) {
@@ -104,23 +104,23 @@ static int umqtt_resolve_uri(const char *umqtt_uri, struct addrinfo **res)
         strncpy(port_str, host_addr + host_addr_len + 2, port_len);
         port_str[port_len] = '\0';
         // LOG_D("ipv6 address port: %s", port_str);
-    } 
+    }
     else    /* ipv4 or domain. */
-    {                    
+    {
         ptr = strstr(host_addr, ":");
-        if (!ptr) 
+        if (!ptr)
         {
             rc = UMQTT_INPARAMS_NULL;
             goto exit;
         }
         host_addr_len = ptr - host_addr;
-        if ((host_addr_len < 1) || (host_addr_len > uri_len)) 
+        if ((host_addr_len < 1) || (host_addr_len > uri_len))
         {
             rc = UMQTT_INPARAMS_NULL;
             goto exit;
         }
         port_len = uri_len - 6 - host_addr_len - 1;
-        if ((port_len >= 6) || (port_len < 1)) 
+        if ((port_len >= 6) || (port_len < 1))
         {
             rc = UMQTT_INPARAMS_NULL;
             goto exit;
@@ -136,19 +136,19 @@ static int umqtt_resolve_uri(const char *umqtt_uri, struct addrinfo **res)
         /* resolve the host name. */
         host_addr_new = rt_malloc(host_addr_len + 1);
 
-        if (!host_addr_new) 
+        if (!host_addr_new)
         {
             rc = UMQTT_MEM_FULL;
             goto exit;
         }
 
-        memcpy(host_addr_new, host_addr, host_addr_len);
+        rt_memcpy(host_addr_new, host_addr, host_addr_len);
         host_addr_new[host_addr_len] = '\0';
 
-        memset(&hint, 0, sizeof(hint));
+        rt_memset(&hint, 0, sizeof(hint));
 
         ret = getaddrinfo(host_addr_new, port_str, &hint, res);
-        if (ret != 0) 
+        if (ret != 0)
         {
             LOG_E("getaddrinfo err: %d '%s'", ret, host_addr_new);
             rc = UMQTT_FAILED;
@@ -157,7 +157,7 @@ static int umqtt_resolve_uri(const char *umqtt_uri, struct addrinfo **res)
     }
 
 exit:
-    if (host_addr_new != RT_NULL) 
+    if (host_addr_new != RT_NULL)
     {
         rt_free(host_addr_new);
         host_addr_new = RT_NULL;
@@ -165,7 +165,7 @@ exit:
     return rc;
 }
 
-/** 
+/**
  * TCP/TLS Connection Complete for configured transport
  *
  * @param uri the input server URI address
@@ -178,17 +178,17 @@ int umqtt_trans_connect(const char *uri, int *sock)
 {
     int _ret = 0;
     struct addrinfo *addr_res = RT_NULL;
-    
+
     *sock = -1;
     _ret = umqtt_resolve_uri(uri, &addr_res);
-    if ((_ret < 0) || (addr_res == RT_NULL)) 
+    if ((_ret < 0) || (addr_res == RT_NULL))
     {
         LOG_E("resolve uri err");
         _ret = UMQTT_FAILED;
         goto exit;
     }
 
-    if ((*sock = socket(addr_res->ai_family, SOCK_STREAM, UMQTT_SOCKET_PROTOCOL)) < 0) 
+    if ((*sock = socket(addr_res->ai_family, SOCK_STREAM, UMQTT_SOCKET_PROTOCOL)) < 0)
     {
         LOG_E("create socket error!");
         _ret = UMQTT_FAILED;
@@ -196,14 +196,14 @@ int umqtt_trans_connect(const char *uri, int *sock)
     }
 
     _ret = ioctlsocket(*sock, FIONBIO, 0);
-    if (_ret < 0) 
+    if (_ret < 0)
     {
         LOG_E(" iocontrol socket error!");
         _ret = UMQTT_FAILED;
         goto exit;
     }
 
-    if ((_ret = connect(*sock, addr_res->ai_addr, addr_res->ai_addrlen)) < 0) 
+    if ((_ret = connect(*sock, addr_res->ai_addr, addr_res->ai_addrlen)) < 0)
     {
         LOG_E(" connect err!");
         closesocket(*sock);
@@ -220,7 +220,7 @@ exit:
     return _ret;
 }
 
-/** 
+/**
  * TCP/TLS transport disconnection requests on configured transport.
  *
  * @param sock the input socket
@@ -232,12 +232,12 @@ int umqtt_trans_disconnect(int sock)
 {
     int _ret = 0;
     _ret = closesocket(sock);
-    if (_ret < 0) 
+    if (_ret < 0)
         return -errno;
     return _ret;
 }
 
-/** 
+/**
  * TCP/TLS send datas on configured transport.
  *
  * @param sock the input socket
@@ -252,10 +252,10 @@ int umqtt_trans_send(int sock, const rt_uint8_t *send_buf, rt_uint32_t buf_len, 
 {
     int _ret = 0;
     rt_uint32_t offset = 0U;
-    while (offset < buf_len) 
+    while (offset < buf_len)
     {
         _ret = send(sock, send_buf + offset, buf_len - offset, 0);
-        if (_ret < 0) 
+        if (_ret < 0)
             return -errno;
         offset += _ret;
     }
@@ -263,7 +263,7 @@ int umqtt_trans_send(int sock, const rt_uint8_t *send_buf, rt_uint32_t buf_len, 
     return _ret;
 }
 
-/** 
+/**
  * TCP/TLS receive datas on configured transport.
  *
  * @param sock the input socket
