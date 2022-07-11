@@ -55,7 +55,7 @@ static int MQTTDeserialize_publish(struct umqtt_msg *pub_msg, rt_uint8_t *buf, i
     curdata += (rc = umqtt_pkgs_decodeBuf(curdata, &mylen));
     enddata = curdata + mylen;
 
-    if (!umqtt_readlenstring((int *)&(pub_msg->msg.publish.topic_name_len), &(pub_msg->msg.publish.topic_name), &curdata, enddata)
+    if (!umqtt_readlenstring((int *)&(pub_msg->msg.publish.topic_name_len), (char **)(&(pub_msg->msg.publish.topic_name)), &curdata, enddata)
      || (enddata - curdata < 0))
     {
         LOG_E(" decode publish, topic name error!");
@@ -67,7 +67,7 @@ static int MQTTDeserialize_publish(struct umqtt_msg *pub_msg, rt_uint8_t *buf, i
         pub_msg->msg.publish.packet_id = umqtt_readInt(&curdata);
 
     pub_msg->msg.publish.payload_len = enddata - curdata;
-    pub_msg->msg.publish.payload = curdata;
+    pub_msg->msg.publish.payload = (const char *)curdata;
 exit:
     return rc;
 }
