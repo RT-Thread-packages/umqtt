@@ -16,6 +16,8 @@
 
 #include <rtthread.h>
 #include <sys/socket.h>
+#include <sys/ioctl.h>
+#include <sys/errno.h>
 #include <netdb.h>
 #include <sal_tls.h>
 

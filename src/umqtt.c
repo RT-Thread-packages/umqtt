@@ -12,7 +12,7 @@
 
 #include <rtthread.h>
 #include <rtdef.h>
-
+#include <sys/errno.h>
 #include "umqtt_cfg.h"
 #include "umqtt_internal.h"
 #include "umqtt.h"
@@ -183,7 +183,7 @@ static int add_one_qos2_msg(struct umqtt_client *client, struct umqtt_pkgs_publi
         rt_list_insert_after(&client->qos2_msg_list, &msg->next_list);
     }
 
-_exit:
+//_exit:
     if (_ret == UMQTT_MEM_FULL)
     {
         if (msg)
@@ -382,7 +382,7 @@ static int umqtt_connect(struct umqtt_client *client, int block)
 {
     int _ret = 0, _length = 0, _cnt = 0;
     struct umqtt_msg encode_msg = { 0 };
-    struct umqtt_msg_ack msg_ack = { 0 };
+    //struct umqtt_msg_ack msg_ack = { 0 };
     RT_ASSERT(client);
 
 _reconnect:
@@ -638,7 +638,7 @@ exit:
 
 static int umqtt_handle_readpacket(struct umqtt_client *client)
 {
-    int _ret = 0, _onedata = 0, _cnt = 0, _loop_cnt = 0, _remain_len = 0;
+    int _ret = 0, _onedata = 0, _cnt = 0, _loop_cnt = 0;// _remain_len = 0;
     int _temp_ret = 0;
     int _pkt_len = 0;
     int _multiplier = 1;
@@ -1222,7 +1222,7 @@ umqtt_client_t umqtt_create(const struct umqtt_info *info)
             _length = strlen(mqtt_client->mqtt_info.lwt_topic) + 1;
             p_subtop->topicfilter = (char *)rt_calloc(1, sizeof(char) * _length);
             rt_strncpy(p_subtop->topicfilter, mqtt_client->mqtt_info.lwt_topic, _length);
-            p_subtop->callback = mqtt_client->mqtt_info.lwt_cb;
+            p_subtop->callback = (void (*)(void *, void *))(mqtt_client->mqtt_info.lwt_cb);
             rt_list_insert_after(&mqtt_client->sub_recv_list, &p_subtop->next_list);
         }
     }
@@ -1732,7 +1732,7 @@ int umqtt_subscribe(struct umqtt_client *client, const char *topic, enum umqtt_q
                 p_subtop->qos = qos;
                 if (callback)
                 {
-                    p_subtop->callback = callback;
+                    p_subtop->callback = (void (*)(void *, void *))callback;
                 }
                 rt_list_insert_after(&client->sub_recv_list, &p_subtop->next_list);
                 set_uplink_recon_tick(client, UPLINK_NEXT_TICK);
@@ -1931,7 +1931,7 @@ int umqtt_control(struct umqtt_client *client, enum umqtt_cmd cmd, void *params)
     struct subtop_recv_handler *p_subtop = RT_NULL;
     rt_list_t *node = RT_NULL;
     char *topic = RT_NULL;
-    int _ret = 0;
+    //int _ret = 0;
     RT_ASSERT(client);
     switch(cmd)
     {
